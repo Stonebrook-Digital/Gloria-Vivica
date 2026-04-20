@@ -9,7 +9,9 @@ const nextConfig: NextConfig = {
   },
   /**
    * Dev-only: webpack persistent cache can desync with HMR and surface
-   * `__webpack_modules__[moduleId] is not a function`. Production builds keep default caching.
+   * `__webpack_modules__[moduleId] is not a function` (blank page if the client chunk fails).
+   * Avoid `experimental.optimizePackageImports` for `motion` here—it has triggered that
+   * runtime error with this stack. Production keeps default webpack caching.
    */
   webpack: (config, { dev }) => {
     if (dev) {

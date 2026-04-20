@@ -2,11 +2,19 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { AnimatePresence, motion, useScroll } from "motion/react";
+import { subscribeScrollFrame } from "@/lib/scrollFrame";
 
 const HERO_TITLES = ["Actress", "Performer", "Storyteller"];
 
-/** Sticky section title fades out when `overlapRef` (first content block) scrolls up over it—same idea as the hero. */
-function useStickyOverlapFade(overlapRef: RefObject<HTMLElement | null>) {
+/**
+ * Sticky section title fades out before content meets it: visibility uses
+ * `overlap.top > title.bottom + fadeLeadPx` so the title hides while there is still
+ * a gap (avoids one frame of text showing through + slow opacity overlap).
+ */
+function useStickyOverlapFade(
+  overlapRef: RefObject<HTMLElement | null>,
+  fadeLeadPx: number = 40,
+) {
   const titleRef = useRef<HTMLDivElement>(null);
   const [titleVisible, setTitleVisible] = useState(true);
 
@@ -17,16 +25,10 @@ function useStickyOverlapFade(overlapRef: RefObject<HTMLElement | null>) {
       if (!overlap || !title) return;
       const oRect = overlap.getBoundingClientRect();
       const tRect = title.getBoundingClientRect();
-      setTitleVisible(!(oRect.top <= tRect.bottom));
+      setTitleVisible(oRect.top > tRect.bottom + fadeLeadPx);
     };
-    window.addEventListener("scroll", tick, { passive: true });
-    window.addEventListener("resize", tick);
-    tick();
-    return () => {
-      window.removeEventListener("scroll", tick);
-      window.removeEventListener("resize", tick);
-    };
-  }, [overlapRef]);
+    return subscribeScrollFrame(tick);
+  }, [overlapRef, fadeLeadPx]);
 
   return { titleRef, titleVisible };
 }
@@ -63,9 +65,7 @@ function Navigation() {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    return subscribeScrollFrame(handleScroll);
   }, []);
 
   useEffect(() => {
@@ -139,9 +139,7 @@ function Hero() {
       setTextVisible(!(imageRect.top <= textRect.bottom));
     };
 
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    return subscribeScrollFrame(handleScroll);
   }, []);
 
   return (
@@ -191,7 +189,13 @@ function Hero() {
             className="lg:col-span-6 lg:col-start-4 relative mx-auto w-full max-w-xl z-20"
           >
             <div className="relative aspect-[4/5] overflow-hidden rounded-3xl">
-              <img src="/uploads/IMG_3464(2).jpg" alt="Gloria Vivica" className="w-full h-full object-cover" />
+              <img
+                src="/uploads/IMG_3464(2).jpg"
+                alt="Gloria Vivica"
+                className="w-full h-full object-cover"
+                fetchPriority="high"
+                decoding="async"
+              />
               <div className="absolute inset-0 ring-1 ring-inset ring-[var(--plum-red)]/20 pointer-events-none rounded-3xl" />
             </div>
           </motion.div>
@@ -215,7 +219,7 @@ function Hero() {
 
 function Work() {
   const overlapRef = useRef<HTMLDivElement>(null);
-  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef);
+  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 52);
 
   const projects = [
     { title: "Example project one", role: "Lead", type: "Feature film", year: "20XX" },
@@ -341,7 +345,7 @@ function Work() {
 
 function Gallery() {
   const overlapRef = useRef<HTMLDivElement>(null);
-  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef);
+  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 148);
 
   const images = [
     { src: "/uploads/gloria-benavides-4.jpeg", alt: "Portrait 1" },
@@ -353,23 +357,26 @@ function Gallery() {
   return (
     <section id="gallery" className="relative w-full bg-transparent py-24 sm:py-32 lg:py-40">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
-        <div
-          ref={titleRef}
-          className="sticky top-32 sm:top-36 lg:top-44 z-[2] mb-16 sm:mb-20 lg:mb-24 transition-opacity duration-300"
-          style={{
-            opacity: titleVisible ? 1 : 0,
-            pointerEvents: titleVisible ? "auto" : "none",
-          }}
-        >
-          <motion.h2
-            initial={{ opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-            className="text-6xl sm:text-7xl lg:text-8xl xl:text-[9rem] 2xl:text-[10rem] tracking-tighter text-[var(--deep-olive)] leading-[0.9] font-['Instrument_Serif'] text-center"
+        {/* Short padding runway limits sticky travel without a huge empty gap above the grid. */}
+        <div className="relative mb-10 sm:mb-14 lg:mb-20 pb-6 sm:pb-8 lg:pb-10">
+          <div
+            ref={titleRef}
+            className="sticky top-32 sm:top-36 lg:top-44 z-[2] transition-opacity duration-100 ease-out"
+            style={{
+              opacity: titleVisible ? 1 : 0,
+              pointerEvents: titleVisible ? "auto" : "none",
+            }}
           >
-            Gallery
-          </motion.h2>
+            <motion.h2
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+              className="text-6xl sm:text-7xl lg:text-8xl xl:text-[9rem] 2xl:text-[10rem] tracking-tight text-[var(--deep-olive)] leading-[0.95] font-['Instrument_Serif'] text-center px-2 sm:whitespace-nowrap"
+            >
+              Gallery
+            </motion.h2>
+          </div>
         </div>
         <div className="grid grid-cols-12 gap-4 lg:gap-6">
           {images.map((image, idx) => (
@@ -383,7 +390,13 @@ function Gallery() {
               className={`relative z-10 ${idx % 2 === 0 ? "col-span-12 lg:col-span-7" : "col-span-12 lg:col-span-5 lg:mt-20"}`}
             >
               <div className="relative aspect-[4/5] lg:aspect-[3/4] overflow-hidden rounded-3xl">
-                <img src={image.src} alt={image.alt} className="w-full h-full object-cover" />
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
             </motion.div>
           ))}
@@ -395,28 +408,30 @@ function Gallery() {
 
 function About() {
   const overlapRef = useRef<HTMLDivElement>(null);
-  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef);
+  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 120);
 
   return (
     <section id="about" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 lg:px-12">
       <div className="max-w-[1400px] mx-auto">
-        <div
-          ref={titleRef}
-          className="sticky top-32 sm:top-36 lg:top-44 z-[2] mb-12 lg:mb-16 transition-opacity duration-300"
-          style={{
-            opacity: titleVisible ? 1 : 0,
-            pointerEvents: titleVisible ? "auto" : "none",
-          }}
-        >
-          <motion.h2
-            initial={{ opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
-            className="text-6xl sm:text-7xl lg:text-8xl xl:text-[9rem] 2xl:text-[10rem] tracking-tighter text-[var(--deep-olive)] leading-[0.9] font-['Instrument_Serif'] text-center"
+        <div className="relative mb-10 sm:mb-12 lg:mb-16 pb-6 sm:pb-8 lg:pb-10">
+          <div
+            ref={titleRef}
+            className="sticky top-32 sm:top-36 lg:top-44 z-[2] transition-opacity duration-100 ease-out"
+            style={{
+              opacity: titleVisible ? 1 : 0,
+              pointerEvents: titleVisible ? "auto" : "none",
+            }}
           >
-            About
-          </motion.h2>
+            <motion.h2
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
+              className="text-6xl sm:text-7xl lg:text-8xl xl:text-[9rem] 2xl:text-[10rem] tracking-tight text-[var(--deep-olive)] leading-[0.95] font-['Instrument_Serif'] text-center px-2 sm:whitespace-nowrap"
+            >
+              About
+            </motion.h2>
+          </div>
         </div>
 
         <div ref={overlapRef} className="relative z-10 space-y-12 lg:space-y-16">
@@ -424,7 +439,7 @@ function About() {
             <motion.p
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
+              viewport={{ once: true, amount: "some", margin: "0px 0px -200px 0px" }}
               transition={{ duration: 0.75, delay: 0.05 }}
             >
               Gloria Vivica is a City, State–based actress with a passion for authentic storytelling and emotionally
@@ -434,7 +449,7 @@ function About() {
             <motion.p
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
+              viewport={{ once: true, amount: "some", margin: "0px 0px -200px 0px" }}
               transition={{ duration: 0.75, delay: 0.12 }}
             >
               Her training emphasizes emotional truth and meticulous preparation. She continues to seek diverse roles
@@ -445,7 +460,7 @@ function About() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ once: true, amount: "some", margin: "0px 0px -180px 0px" }}
             transition={{ duration: 0.8, delay: 0.08 }}
             className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12 pt-12 lg:pt-16 border-t border-[var(--deep-olive)]/28 max-w-5xl mx-auto"
           >
@@ -456,10 +471,12 @@ function About() {
               { label: "Focus", value: "Film & TV" },
             ].map((item) => (
               <div key={item.label} className="text-center">
-                <p className="text-xs sm:text-sm tracking-wider uppercase text-[var(--plum-red)] mb-3">
+                <p className="font-['Syne'] font-semibold text-[10px] sm:text-[11px] tracking-[0.28em] uppercase text-[var(--plum-red)] mb-3 sm:mb-4 leading-tight">
                   {item.label}
                 </p>
-                <p className="text-base sm:text-lg text-[var(--deep-olive)]">{item.value}</p>
+                <p className="font-['Instrument_Serif'] text-xl sm:text-2xl lg:text-[1.65rem] text-[var(--deep-olive)] leading-snug tracking-tight">
+                  {item.value}
+                </p>
               </div>
             ))}
           </motion.div>
@@ -467,7 +484,7 @@ function About() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ once: true, amount: "some", margin: "0px 0px -200px 0px" }}
             transition={{ duration: 0.8, delay: 0.1 }}
             className="relative pt-12 lg:pt-20 max-w-4xl mx-auto"
           >
@@ -581,16 +598,25 @@ function CursorEffect() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+    const pending = { x: 0, y: 0 };
+    let raf = 0;
+    const flush = () => {
+      raf = 0;
+      setMousePosition({ x: pending.x, y: pending.y });
       setIsVisible(true);
     };
+    const handleMouseMove = (e: MouseEvent) => {
+      pending.x = e.clientX;
+      pending.y = e.clientY;
+      if (!raf) raf = requestAnimationFrame(flush);
+    };
     const handleMouseLeave = () => setIsVisible(false);
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
     document.body.addEventListener("mouseleave", handleMouseLeave);
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       document.body.removeEventListener("mouseleave", handleMouseLeave);
+      if (raf) cancelAnimationFrame(raf);
     };
   }, []);
 
@@ -646,89 +672,49 @@ type BlobConfig = {
   blurClass: string;
   duration: number;
   delay: number;
-  x: string[];
-  y: string[];
-  scale: number[];
 };
 
+/** Four blobs + lighter blur + CSS keyframes (no Motion): much cheaper than six Motion-driven blur layers. */
 const BACKGROUND_BLOBS: BlobConfig[] = [
   {
     size: 820,
     left: "-12%",
     top: "-6%",
     gradient: "radial-gradient(circle, var(--plum-red) 0%, color-mix(in oklab, var(--plum-red) 40%, transparent) 45%, transparent 72%)",
-    opacity: 0.26,
-    blurClass: "blur-[120px]",
+    opacity: 0.28,
+    blurClass: "blur-[80px]",
     duration: 28,
     delay: 1,
-    x: ["0vw", "5vw", "-3vw", "0vw"],
-    y: ["0vh", "4vh", "-2vh", "0vh"],
-    scale: [1, 1.12, 1.05, 1],
   },
   {
     size: 680,
     left: "72%",
     top: "-4%",
     gradient: "radial-gradient(circle, var(--olive-green) 0%, color-mix(in oklab, var(--sage) 50%, transparent) 50%, transparent 70%)",
-    opacity: 0.22,
-    blurClass: "blur-[100px]",
+    opacity: 0.24,
+    blurClass: "blur-[72px]",
     duration: 26,
     delay: 3,
-    x: ["0vw", "-6vw", "4vw", "0vw"],
-    y: ["0vh", "5vh", "3vh", "0vh"],
-    scale: [1, 1.08, 1.1, 1],
   },
   {
     size: 900,
     left: "38%",
     top: "48%",
     gradient: "radial-gradient(circle, var(--tan) 0%, var(--terracotta) 35%, transparent 68%)",
-    opacity: 0.2,
-    blurClass: "blur-[130px]",
+    opacity: 0.22,
+    blurClass: "blur-[88px]",
     duration: 30,
     delay: 2,
-    x: ["0vw", "-4vw", "6vw", "0vw"],
-    y: ["0vh", "-5vh", "4vh", "0vh"],
-    scale: [1, 1.06, 1.14, 1],
-  },
-  {
-    size: 640,
-    left: "-6%",
-    top: "58%",
-    gradient: "radial-gradient(circle, var(--sage) 0%, var(--olive-green) 40%, transparent 70%)",
-    opacity: 0.18,
-    blurClass: "blur-[95px]",
-    duration: 24,
-    delay: 4,
-    x: ["0vw", "7vw", "-2vw", "0vw"],
-    y: ["0vh", "-4vh", "-3vh", "0vh"],
-    scale: [1, 1.1, 1.04, 1],
-  },
-  {
-    size: 760,
-    left: "52%",
-    top: "12%",
-    gradient: "radial-gradient(circle, color-mix(in oklab, var(--plum-red) 85%, #2a0a12) 0%, var(--plum-red) 28%, transparent 65%)",
-    opacity: 0.24,
-    blurClass: "blur-[110px]",
-    duration: 27,
-    delay: 5,
-    x: ["0vw", "4vw", "-5vw", "0vw"],
-    y: ["0vh", "6vh", "-3vh", "0vh"],
-    scale: [1, 1.09, 1.07, 1],
   },
   {
     size: 720,
     left: "8%",
     top: "22%",
     gradient: "radial-gradient(circle, var(--warm-beige) 0%, var(--tan) 42%, transparent 68%)",
-    opacity: 0.17,
-    blurClass: "blur-[105px]",
+    opacity: 0.2,
+    blurClass: "blur-[70px]",
     duration: 22,
     delay: 6,
-    x: ["0vw", "-5vw", "3vw", "0vw"],
-    y: ["0vh", "3vh", "5vh", "0vh"],
-    scale: [1, 1.11, 1.03, 1],
   },
 ];
 
@@ -736,27 +722,24 @@ function AnimatedBackground() {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
       <div className="absolute inset-0 bg-gradient-to-br from-[var(--cream)] via-[var(--warm-cream)] to-[var(--warm-beige)]" />
-      {BACKGROUND_BLOBS.map((blob, i) => (
-        <motion.div
-          key={i}
-          className={`absolute rounded-full ${blob.blurClass}`}
-          style={{
-            width: blob.size,
-            height: blob.size,
-            left: blob.left,
-            top: blob.top,
-            background: blob.gradient,
-            opacity: blob.opacity,
-          }}
-          animate={{ x: blob.x, y: blob.y, scale: blob.scale }}
-          transition={{
-            duration: blob.duration,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: blob.delay,
-          }}
-        />
-      ))}
+      <div className="portfolio-bg-blobs absolute inset-0" aria-hidden>
+        {BACKGROUND_BLOBS.map((blob, i) => (
+          <div
+            key={i}
+            className={`portfolio-bg-blob portfolio-bg-blob--${i} absolute rounded-full ${blob.blurClass}`}
+            style={{
+              width: blob.size,
+              height: blob.size,
+              left: blob.left,
+              top: blob.top,
+              background: blob.gradient,
+              opacity: blob.opacity,
+              animationDuration: `${blob.duration}s`,
+              animationDelay: `${blob.delay}s`,
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }

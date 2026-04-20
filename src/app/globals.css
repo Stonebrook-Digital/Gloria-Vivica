@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=Syne:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @source "../../src/**/*.{js,ts,jsx,tsx,mdx}";
 
@@ -1406,5 +1406,84 @@ h3 {
     grid-column: 1 / -1;
     padding-top: clamp(0.75rem, 2vw, 1rem);
     border-top: 1px solid color-mix(in hsl, var(--panel-line) 55%, transparent);
+  }
+}
+
+/* Portfolio background blobs: pure CSS animation (compositor-only), lighter than Motion + huge blur stacks. */
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-bg-blobs {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .portfolio-bg-blob {
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes portfolio-bg-blob-0 {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    33% {
+      transform: translate3d(5vw, 4vh, 0) scale(1.12);
+    }
+    66% {
+      transform: translate3d(-3vw, -2vh, 0) scale(1.05);
+    }
+  }
+
+  @keyframes portfolio-bg-blob-1 {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    33% {
+      transform: translate3d(-6vw, 5vh, 0) scale(1.08);
+    }
+    66% {
+      transform: translate3d(4vw, 3vh, 0) scale(1.1);
+    }
+  }
+
+  @keyframes portfolio-bg-blob-2 {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    33% {
+      transform: translate3d(-4vw, -5vh, 0) scale(1.06);
+    }
+    66% {
+      transform: translate3d(6vw, 4vh, 0) scale(1.14);
+    }
+  }
+
+  @keyframes portfolio-bg-blob-3 {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    33% {
+      transform: translate3d(-5vw, 3vh, 0) scale(1.11);
+    }
+    66% {
+      transform: translate3d(3vw, 5vh, 0) scale(1.03);
+    }
+  }
+
+  .portfolio-bg-blob--0 {
+    animation-name: portfolio-bg-blob-0;
+  }
+  .portfolio-bg-blob--1 {
+    animation-name: portfolio-bg-blob-1;
+  }
+  .portfolio-bg-blob--2 {
+    animation-name: portfolio-bg-blob-2;
+  }
+  .portfolio-bg-blob--3 {
+    animation-name: portfolio-bg-blob-3;
   }
 }
