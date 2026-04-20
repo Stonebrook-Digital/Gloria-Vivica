@@ -1,5 +1,5 @@
-import { WorkGallery } from '@/components/WorkGallery'
+import { redirect } from "next/navigation";
 
 export default function WorksPage() {
-  return <WorkGallery />
+  redirect("/");
 }

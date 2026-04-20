@@ -1,31 +1,18 @@
-import type { Metadata } from 'next'
-import { Montserrat } from 'next/font/google'
-import { SiteShell } from '@/components/SiteShell'
-import './globals.css'
-
-const siteMetaDescription =
-  'Minimal editorial portfolio — film, theatre, select bookings.'
-
-const sans = Montserrat({
-  subsets: ['latin'],
-  variable: '--font-editorial',
-  weight: ['300', '400', '500', '600'],
-})
+import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: 'Gloria Laurent',
-  description: siteMetaDescription,
+  title: "Gloria Vivica",
+  description: "Portfolio site",
   icons: {
-    icon: '/favicon.svg',
+    icon: "/favicon.svg",
   },
-}
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={sans.variable}>
-      <body>
-        <SiteShell>{children}</SiteShell>
-      </body>
+    <html lang="en">
+      <body>{children}</body>
     </html>
-  )
+  );
 }
