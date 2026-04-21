@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "scripts": {
     "clean": "rm -rf .next node_modules/.cache .turbo",
-    "dev": "next dev",
-    "dev:clean": "npm run clean && next dev",
-    "dev:turbo": "npm run clean && next dev --turbo",
+    "dev": "next dev --turbo",
+    "dev:webpack": "next dev",
+    "dev:clean": "npm run clean && next dev --turbo",
+    "dev:webpack:clean": "npm run clean && next dev",
     "build": "next build",
     "build:clean": "npm run clean && next build",
     "start": "next start",
