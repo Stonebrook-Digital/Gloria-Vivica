@@ -353,7 +353,7 @@ function Gallery() {
   const images = [
     { src: "/uploads/gloria-benavides-4.jpeg", alt: "Portrait 1" },
     { src: "/uploads/Resized_GloriaBenavides_EMW_24-00060.jpeg", alt: "Portrait 2" },
-    { src: "/uploads/WhatsApp%20Image%202026-04-20%20at%2011.42.32%20PM.jpeg", alt: "Portrait 3" },
+    { src: "/uploads/IMG_3464(2).jpg", alt: "Portrait 3" },
     { src: "/uploads/Facetune_20-08-2025-01-19-02(1).jpg", alt: "Portrait 4" },
   ];
 
