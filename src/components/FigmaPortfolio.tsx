@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { AnimatePresence, motion, useScroll } from "motion/react";
+import { AnimatePresence, motion, useScroll } from "framer-motion";
 import { subscribeScrollFrame } from "@/lib/scrollFrame";
 
 const HERO_TITLES = ["Actress", "Performer", "Storyteller"];
@@ -182,7 +182,7 @@ function Hero() {
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mt-24 lg:mt-32">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mt-16 lg:mt-24">
           <motion.div
             ref={imageRef}
             initial={{ opacity: 0, scale: 1.05 }}
@@ -192,9 +192,9 @@ function Hero() {
           >
             <div className="relative aspect-[4/5] overflow-hidden rounded-3xl">
               <img
-                src="/uploads/IMG_3464(2).jpg"
+                src="/uploads/WhatsApp%20Image%202026-04-20%20at%2011.42.32%20PM.jpeg"
                 alt="Gloria Vivica"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-[center_35%]"
                 fetchPriority="high"
                 decoding="async"
               />
@@ -353,7 +353,7 @@ function Gallery() {
   const images = [
     { src: "/uploads/gloria-benavides-4.jpeg", alt: "Portrait 1" },
     { src: "/uploads/Resized_GloriaBenavides_EMW_24-00060.jpeg", alt: "Portrait 2" },
-    { src: "/uploads/IMG_3411.JPG", alt: "Portrait 3" },
+    { src: "/uploads/WhatsApp%20Image%202026-04-20%20at%2011.42.32%20PM.jpeg", alt: "Portrait 3" },
     { src: "/uploads/Facetune_20-08-2025-01-19-02(1).jpg", alt: "Portrait 4" },
   ];
 

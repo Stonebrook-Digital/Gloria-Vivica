@@ -7,6 +7,10 @@ export type PortfolioPhoto = {
   label: string
 }
 
+/** Spaces URL-encoded for reliable static delivery. */
+const studioHeadshotApr2026 =
+  '/uploads/WhatsApp%20Image%202026-04-20%20at%2011.42.32%20PM.jpeg' as const
+
 export const portfolioPhotos: readonly PortfolioPhoto[] = [
   {
     id: 'emw-24',
@@ -30,25 +34,17 @@ export const portfolioPhotos: readonly PortfolioPhoto[] = [
     label: 'Facetune portrait',
   },
   {
-    id: 'sheet-3464',
-    src: '/uploads/IMG_3464(2).jpg',
-    w: 3999,
-    h: 5492,
-    label: 'Contact sheet',
-  },
-  {
-    id: 'img-3411',
-    src: '/uploads/IMG_3411.JPG',
-    w: 3619,
-    h: 5112,
-    label: 'Portrait',
+    id: 'studio-headshot-2026-04',
+    src: studioHeadshotApr2026,
+    w: 1286,
+    h: 1600,
+    label: 'Studio headshot',
   },
 ]
 
 /** /works grid: wider shots first so the page does not open on a tight face crop. */
 export const workGalleryPhotos: readonly PortfolioPhoto[] = [
   portfolioPhotos[3],
-  portfolioPhotos[4],
   portfolioPhotos[1],
   portfolioPhotos[2],
   portfolioPhotos[0],

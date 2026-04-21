@@ -1,5 +1,3 @@
-"use client";
-
 import FigmaPortfolio from "@/components/FigmaPortfolio";
 
 export default function Page() {
