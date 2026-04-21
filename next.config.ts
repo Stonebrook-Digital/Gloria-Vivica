@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
     devtoolSegmentExplorer: false,
   },
   /**
+   * Use with `npm run dev:turbo`. Keeps Next from warning when `webpack()` is also defined.
+   * Default `npm run dev` uses Webpack—Turbopack can race on `_buildManifest.js.tmp` on refresh (ENOENT).
+   */
+  turbopack: {},
+  /**
    * Webpack-only (e.g. `next dev` without `--turbo`, or `next build`):
    * - Disable persistent cache in dev: HMR can desync and cause
    *   `__webpack_modules__[moduleId] is not a function` / blank page.

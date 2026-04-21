@@ -10,6 +10,8 @@ const HERO_TITLES = ["Actress", "Performer", "Storyteller"];
  * Sticky section title fades out before content meets it: visibility uses
  * `overlap.top > title.bottom + fadeLeadPx` so the title hides while there is still
  * a gap (avoids one frame of text showing through + slow opacity overlap).
+ * Keep `fadeLeadPx` smaller than the real title→overlap vertical gap in layout, or
+ * the title wrapper stays at opacity 0 for the whole section.
  */
 function useStickyOverlapFade(
   overlapRef: RefObject<HTMLElement | null>,
@@ -219,7 +221,7 @@ function Hero() {
 
 function Work() {
   const overlapRef = useRef<HTMLDivElement>(null);
-  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 52);
+  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 40);
 
   const projects = [
     { title: "Example project one", role: "Lead", type: "Feature film", year: "20XX" },
@@ -278,9 +280,9 @@ function Work() {
           }}
         >
           <motion.h2
-            initial={{ opacity: 0, y: 28 }}
+            initial={{ opacity: 1, y: 22 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
+            viewport={{ once: true, amount: "some", margin: "0px 0px -120px 0px" }}
             transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
             className="text-6xl sm:text-7xl lg:text-8xl xl:text-[9rem] 2xl:text-[10rem] tracking-tighter text-[var(--deep-olive)] leading-[0.9] font-['Instrument_Serif'] text-center"
           >
@@ -345,7 +347,8 @@ function Work() {
 
 function Gallery() {
   const overlapRef = useRef<HTMLDivElement>(null);
-  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 148);
+  /** Lead must stay below the real title→content gap or the heading stays opacity:0 forever. */
+  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 48);
 
   const images = [
     { src: "/uploads/gloria-benavides-4.jpeg", alt: "Portrait 1" },
@@ -368,9 +371,9 @@ function Gallery() {
             }}
           >
             <motion.h2
-              initial={{ opacity: 0, y: 28 }}
+              initial={{ opacity: 1, y: 22 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
+              viewport={{ once: true, amount: "some", margin: "0px 0px -120px 0px" }}
               transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
               className="text-6xl sm:text-7xl lg:text-8xl xl:text-[9rem] 2xl:text-[10rem] tracking-tight text-[var(--deep-olive)] leading-[0.95] font-['Instrument_Serif'] text-center px-2 sm:whitespace-nowrap"
             >
@@ -408,7 +411,8 @@ function Gallery() {
 
 function About() {
   const overlapRef = useRef<HTMLDivElement>(null);
-  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 120);
+  /** ~40px lead: larger values exceeded the layout gap and hid “About” whenever this section was on screen. */
+  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 40);
 
   return (
     <section id="about" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 lg:px-12">
@@ -423,9 +427,9 @@ function About() {
             }}
           >
             <motion.h2
-              initial={{ opacity: 0, y: 28 }}
+              initial={{ opacity: 1, y: 22 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
+              viewport={{ once: true, amount: "some", margin: "0px 0px -120px 0px" }}
               transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
               className="text-6xl sm:text-7xl lg:text-8xl xl:text-[9rem] 2xl:text-[10rem] tracking-tight text-[var(--deep-olive)] leading-[0.95] font-['Instrument_Serif'] text-center px-2 sm:whitespace-nowrap"
             >
@@ -471,7 +475,7 @@ function About() {
               { label: "Focus", value: "Film & TV" },
             ].map((item) => (
               <div key={item.label} className="text-center">
-                <p className="font-['Syne'] font-semibold text-[10px] sm:text-[11px] tracking-[0.28em] uppercase text-[var(--plum-red)] mb-3 sm:mb-4 leading-tight">
+                <p className="font-['Syne'] font-bold text-xs sm:text-sm tracking-[0.22em] uppercase text-[var(--plum-red)] mb-3 sm:mb-4 leading-snug">
                   {item.label}
                 </p>
                 <p className="font-['Instrument_Serif'] text-xl sm:text-2xl lg:text-[1.65rem] text-[var(--deep-olive)] leading-snug tracking-tight">
