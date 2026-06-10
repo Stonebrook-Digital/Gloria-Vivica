@@ -2,13 +2,13 @@
 export const site = {
   name: 'Gloria',
   /** Full line shown in hero / footer row (all caps in UI). */
-  formalName: 'Gloria Laurent',
+  formalName: 'Gloria Vivica Benavides',
   /** Large footer mark, spaced like “A . D”. */
-  initialsMark: 'G . L',
-  logoMark: 'G.L',
+  initialsMark: 'G . V',
+  logoMark: 'G.V',
   productionLine: 'Film & theatre',
   locationLine: 'Los Angeles, California',
-  contactEmail: 'hello@example.com',
+  contactEmail: 'gregg@gb-management.com',
   /** Primary hero portrait (`public/` path). */
   headshotHero: '/uploads/Resized_GloriaBenavides_EMW_24-00060.jpeg',
   bio: [
@@ -16,7 +16,7 @@ export const site = {
     'Select bookings and collaborations by inquiry. Representation and materials available on request.',
   ],
   social: [
-    { label: 'Email', href: 'mailto:hello@example.com' },
+    { label: 'Email', href: 'mailto:gregg@gb-management.com' },
     { label: 'Insta', href: '#' },
     { label: 'LinkedIn', href: '#' },
   ],
@@ -25,12 +25,12 @@ export const site = {
     headline: 'Get in touch',
     blurb:
       'For bookings, press kits, and general inquiries. Replies are usually within a few business days.',
-    email: 'hello@example.com',
-    phone: '+1 (323) 555-0148',
+    email: 'gregg@gb-management.com',
+    phone: '(310) 456-4156',
     rep: {
-      name: 'Northline Talent',
-      email: 'gloria@northlinetalent.example',
-      phone: '+1 (310) 555-0192',
+      name: 'Gregg Baker Management',
+      email: 'gregg@gb-management.com',
+      phone: '(310) 456-4156',
     },
     mailing: ['Studio Mailroom', '4000 Sunset Blvd, Unit 12', 'Los Angeles, CA 90028'],
     hours: 'Mon–Thu, 10am–4pm PT (by appointment)',

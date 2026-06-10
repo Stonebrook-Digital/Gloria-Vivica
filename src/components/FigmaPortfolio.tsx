@@ -223,13 +223,48 @@ function Work() {
   const overlapRef = useRef<HTMLDivElement>(null);
   const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 40);
 
-  const projects = [
-    { title: "Example project one", role: "Lead", type: "Feature film", year: "20XX" },
-    { title: "Example project two", role: "Supporting", type: "Limited series", year: "20XX" },
-    { title: "Example project three", role: "Series regular", type: "Television", year: "20XX" },
-    { title: "Example project four", role: "Guest arc", type: "Television", year: "20XX" },
-    { title: "Example project five", role: "Ensemble", type: "Theater", year: "20XX" },
-    { title: "Example project six", role: "Principal", type: "Short film", year: "20XX" },
+  const projects: {
+    title?: string;
+    role?: string;
+    type?: string;
+    location?: string;
+    quote?: string;
+    quoteSource?: string;
+    standaloneQuote?: boolean;
+    standaloneQuoteVariant?: "display" | "artsy";
+    boxAlign?: "left" | "center" | "right";
+  }[] = [
+    {
+      quote:
+        "Standouts include Gloria Vivica Benavides, who brings sophisticated senses of timing and subtle gesture to Caliban.",
+      quoteSource: "Broadway World Review for The Tempest at Trinity Repertory Theatre",
+      boxAlign: "right",
+    },
+    {
+      quote: "…a scene-stealing Gloria Vivica Benavides",
+      quoteSource: "Chicago Sun Times",
+      standaloneQuote: true,
+    },
+    {
+      quote:
+        "The latter, Gloria Vivica Benavides, is hilarious in that role and as Antonia, a well-meaning neighbor who ignites Reina's dreams of escaping to America.",
+      quoteSource: "Onstage Pittsburgh",
+    },
+    {
+      quote: "a sexy-and-I-know-it hairdresser",
+      standaloneQuote: true,
+    },
+    {
+      quote:
+        "every time Gloria Vivica Benavides opens her mouth to sing, this massive rafter-shaking roar comes forth that leaves the audience breathless.",
+      quoteSource: "Broadway World",
+    },
+    {
+      quote:
+        "Benavides is a break out star of the show, even playing the comic relief. She portrays two characters who are polar opposites from one another, but you'll want more of both.",
+      standaloneQuote: true,
+      standaloneQuoteVariant: "artsy",
+    },
   ];
 
   const layouts = [
@@ -268,6 +303,21 @@ function Work() {
     "text-5xl sm:text-6xl lg:text-7xl",
   ];
 
+  const standaloneQuoteColors: Record<number, { text: string; footer: string }> = {
+    1: {
+      text: "text-[var(--terracotta)]",
+      footer: "text-[var(--terracotta)]/50",
+    },
+    3: {
+      text: "text-[var(--plum-red)]",
+      footer: "text-[var(--plum-red)]/45",
+    },
+    5: {
+      text: "text-[var(--terracotta)]/90",
+      footer: "text-[var(--terracotta)]/45",
+    },
+  };
+
   return (
     <section id="work" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 lg:px-12">
       <div className="max-w-[1400px] mx-auto">
@@ -291,55 +341,141 @@ function Work() {
         </div>
 
         <div className="space-y-16 lg:space-y-24">
-          {projects.map((project, index) => (
+          {projects.map((project, index) => {
+            const meta = [project.type, project.location].filter(Boolean).join(" · ");
+            const hasCredits = project.title || project.role || meta;
+
+            if (project.standaloneQuote && project.quote) {
+              const isArtsy = project.standaloneQuoteVariant === "artsy";
+              const colors = standaloneQuoteColors[index] ?? {
+                text: "text-[var(--terracotta)]",
+                footer: "text-[var(--terracotta)]/50",
+              };
+
+              return (
+                <motion.div
+                  key={`quote-${index}`}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.9, delay: index * 0.1 }}
+                  className={`relative z-10 w-full ${isArtsy ? "py-16 sm:py-20 lg:py-28" : "py-12 sm:py-16 lg:py-24"}`}
+                >
+                  <blockquote
+                    className={`w-full text-center ${isArtsy ? "max-w-5xl mx-auto px-2" : ""}`}
+                  >
+                    <p
+                      className={
+                        isArtsy
+                          ? `text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] xl:text-5xl ${colors.text} font-['Cormorant_Garamond'] font-light leading-[1.45] tracking-[0.02em]`
+                          : `text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] ${colors.text} font-['Instrument_Serif'] italic leading-[1.08] tracking-tight`
+                      }
+                    >
+                      &ldquo;{project.quote}&rdquo;
+                    </p>
+                    {project.quoteSource ? (
+                      <footer
+                        className={`mt-8 sm:mt-10 text-sm sm:text-base ${colors.footer} tracking-[0.18em] uppercase`}
+                      >
+                        {project.quoteSource}
+                      </footer>
+                    ) : null}
+                  </blockquote>
+                </motion.div>
+              );
+            }
+
+            const isQuoteOnlyBox = !hasCredits && Boolean(project.quote);
+            const isRightAlignedBox = project.boxAlign === "right";
+            const quoteBlock = project.quote ? (
+              <blockquote className="space-y-3">
+                <p
+                  className={
+                    isQuoteOnlyBox
+                      ? "text-base sm:text-lg lg:text-xl text-[var(--deep-olive)]/70 leading-[1.7] font-['Inter'] font-normal tracking-normal"
+                      : "text-base sm:text-lg text-[var(--deep-olive)]/80 leading-relaxed font-['Instrument_Serif'] italic"
+                  }
+                >
+                  &ldquo;{project.quote}&rdquo;
+                </p>
+                {project.quoteSource ? (
+                  <footer
+                    className={
+                      isQuoteOnlyBox
+                        ? "text-xs sm:text-sm text-[var(--deep-olive)]/45 tracking-[0.12em] uppercase font-['Inter']"
+                        : "text-sm text-[var(--deep-olive)]/60 tracking-wide"
+                    }
+                  >
+                    — {project.quoteSource}
+                  </footer>
+                ) : null}
+              </blockquote>
+            ) : (
+              <p className="text-base sm:text-lg text-[var(--deep-olive)]/80 leading-relaxed">
+                {WORK_SAMPLE_DESCRIPTION}
+              </p>
+            );
+
+            return (
             <motion.div
-              key={project.title}
+              key={project.title ?? `quote-${index}`}
               ref={index === 0 ? overlapRef : undefined}
               initial={{ opacity: 0, y: 60 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.8, delay: index * 0.1 }}
-              className={`relative z-10 w-full ${layouts[index] ?? layouts[0]}`}
+              className={`relative z-10 w-full ${
+                isRightAlignedBox
+                  ? "lg:ml-auto lg:w-[70%]"
+                  : layouts[index] ?? layouts[0]
+              }`}
             >
               <div
                 className={`${bgColors[index] ?? bgColors[0]} p-8 sm:p-10 lg:p-12 rounded-3xl transition-all duration-500 hover:shadow-2xl border border-[var(--deep-olive)]/10`}
               >
-                <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 lg:gap-12">
-                  <div className="flex-1 min-w-0">
-                    <h3
-                      className={`${titleSizes[index] ?? titleSizes[0]} ${titleColors[index] ?? titleColors[0]} tracking-tighter leading-[0.9] mb-4 lg:mb-6 font-['Instrument_Serif']`}
-                    >
-                      {project.title}
-                    </h3>
-                    <div className="space-y-2">
-                      <p className="text-xl sm:text-2xl lg:text-3xl text-[var(--deep-olive)] font-['Instrument_Serif'] italic">
-                        {project.role}
-                      </p>
-                      <p className="text-sm sm:text-base text-[var(--deep-olive)]/60 tracking-wider uppercase">
-                        {project.type} · City, State · {project.year}
-                      </p>
+                <div
+                  className={
+                    hasCredits
+                      ? "flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 lg:gap-12"
+                      : isRightAlignedBox
+                        ? "flex flex-col items-end text-right max-w-4xl ml-auto w-full"
+                        : "flex flex-col items-center text-center max-w-4xl mx-auto"
+                  }
+                >
+                  {hasCredits ? (
+                    <div className="flex-1 min-w-0">
+                      {project.title ? (
+                        <h3
+                          className={`${titleSizes[index] ?? titleSizes[0]} ${titleColors[index] ?? titleColors[0]} tracking-tighter leading-[0.9] mb-4 lg:mb-6 font-['Instrument_Serif']`}
+                        >
+                          {project.title}
+                        </h3>
+                      ) : null}
+                      {project.role || meta ? (
+                        <div className="space-y-2">
+                          {project.role ? (
+                            <p className="text-xl sm:text-2xl lg:text-3xl text-[var(--deep-olive)] font-['Instrument_Serif'] italic">
+                              {project.role}
+                            </p>
+                          ) : null}
+                          {meta ? (
+                            <p className="text-sm sm:text-base text-[var(--deep-olive)]/60 tracking-wider uppercase">
+                              {meta}
+                            </p>
+                          ) : null}
+                        </div>
+                      ) : null}
                     </div>
-                  </div>
-                  <div className="lg:max-w-[40%] lg:text-right">
-                    <p className="text-base sm:text-lg text-[var(--deep-olive)]/80 leading-relaxed">
-                      {WORK_SAMPLE_DESCRIPTION}
-                    </p>
+                  ) : null}
+                  <div className={hasCredits ? "lg:max-w-[40%] lg:text-right" : "w-full"}>
+                    {quoteBlock}
                   </div>
                 </div>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1.2, delay: 0.4 }}
-          className="mt-24 lg:mt-32 text-center text-2xl sm:text-3xl lg:text-4xl text-[var(--terracotta)] font-['Instrument_Serif'] italic"
-        >
-          Additional credits to be listed here
-        </motion.p>
       </div>
     </section>
   );
@@ -350,7 +486,41 @@ function Gallery() {
   /** Lead must stay below the real title→content gap or the heading stays opacity:0 forever. */
   const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 48);
 
-  const images = [
+  const images: {
+    src: string;
+    alt: string;
+    fit?: "cover" | "natural";
+  }[] = [
+    {
+      src: "/uploads/BE507BCD-108C-4607-A812-D841C08C427C.png",
+      alt: "Gloria Vivica Benavides on stage in an orange dress beneath a Garcia neon sign",
+      fit: "natural",
+    },
+    {
+      src: "/uploads/IMG_1493.JPG",
+      alt: "Gloria Vivica Benavides as Caliban in The Tempest, full-length stage portrait",
+      fit: "natural",
+    },
+    {
+      src: "/uploads/Screenshot%20from%202026-06-10%2012-40-34.png",
+      alt: "Gloria Vivica Benavides on stage as Pancha in a sewing workshop set",
+      fit: "natural",
+    },
+    {
+      src: "/uploads/Screenshot%20from%202026-06-10%2012-41-34.png",
+      alt: "Ensemble cast peering through a purple window set piece on stage",
+      fit: "natural",
+    },
+    {
+      src: "/uploads/Screenshot%20from%202026-06-10%2012-42-11.png",
+      alt: "Gloria Vivica Benavides as Caliban in The Tempest, mid-performance",
+      fit: "natural",
+    },
+    {
+      src: "/uploads/Screenshot%20from%202026-06-10%2012-42-43.png",
+      alt: "Ensemble cast in motion during a Trinity Repertory Theatre production",
+      fit: "natural",
+    },
     { src: "/uploads/gloria-benavides-4.jpeg", alt: "Portrait 1" },
     { src: "/uploads/Resized_GloriaBenavides_EMW_24-00060.jpeg", alt: "Portrait 2" },
     { src: "/uploads/IMG_3464(2).jpg", alt: "Portrait 3" },
@@ -392,11 +562,19 @@ function Gallery() {
               transition={{ duration: 0.8, delay: idx * 0.1 }}
               className={`relative z-10 ${idx % 2 === 0 ? "col-span-12 lg:col-span-7" : "col-span-12 lg:col-span-5 lg:mt-20"}`}
             >
-              <div className="relative aspect-[4/5] lg:aspect-[3/4] overflow-hidden rounded-3xl">
+              <div
+                className={`relative overflow-hidden rounded-3xl ${
+                  image.fit === "natural" ? "" : "aspect-[4/5] lg:aspect-[3/4]"
+                }`}
+              >
                 <img
                   src={image.src}
                   alt={image.alt}
-                  className="w-full h-full object-cover"
+                  className={
+                    image.fit === "natural"
+                      ? "block w-full h-auto"
+                      : "w-full h-full object-cover"
+                  }
                   loading="lazy"
                   decoding="async"
                 />
@@ -466,13 +644,21 @@ function About() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: "some", margin: "0px 0px -180px 0px" }}
             transition={{ duration: 0.8, delay: 0.08 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12 pt-12 lg:pt-16 border-t border-[var(--deep-olive)]/28 max-w-5xl mx-auto"
+            className="grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-12 pt-12 lg:pt-16 border-t border-[var(--deep-olive)]/28 max-w-5xl mx-auto"
           >
             {[
-              { label: "Based in", value: "City, State" },
-              { label: "Experience", value: "10+ years" },
-              { label: "Training", value: "Studio / program" },
-              { label: "Focus", value: "Film & TV" },
+              {
+                label: "Education",
+                value: "BFA Theatre — University of North Texas",
+              },
+              {
+                label: "Training",
+                value: "Michael Chekhov Acting, Theatre Three · Acting, Dallas Theater Center",
+              },
+              {
+                label: "Mediums",
+                value: "Stage · Film & TV · Voice-over",
+              },
             ].map((item) => (
               <div key={item.label} className="text-center">
                 <p className="font-['Syne'] font-bold text-xs sm:text-sm tracking-[0.22em] uppercase text-[var(--plum-red)] mb-3 sm:mb-4 leading-snug">
@@ -483,6 +669,22 @@ function About() {
                 </p>
               </div>
             ))}
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: "some", margin: "0px 0px -180px 0px" }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="max-w-4xl mx-auto text-center"
+          >
+            <p className="font-['Syne'] font-bold text-xs sm:text-sm tracking-[0.22em] uppercase text-[var(--plum-red)] mb-5 sm:mb-6">
+              Special skills
+            </p>
+            <p className="text-base sm:text-lg lg:text-xl text-[var(--deep-olive)]/80 leading-relaxed font-['Inter'] font-normal">
+              Improv · Conversational Spanish (native accent) · Gaming · Fishing · Kickboxing · Boxing · Rifles ·
+              Beginner clarinet · Beginner piano
+            </p>
           </motion.div>
 
           <motion.div
@@ -500,10 +702,10 @@ function About() {
               <div className="md:col-span-5 md:col-start-1 text-left md:text-right md:pr-8 md:border-r md:border-[var(--plum-red)]/15">
                 <p className="text-[11px] sm:text-xs tracking-[0.22em] uppercase text-[var(--plum-red)]/90 mb-2">Email</p>
                 <a
-                  href="mailto:hello@example.com"
+                  href="mailto:gregg@gb-management.com"
                   className="text-lg sm:text-xl font-light tracking-tight text-[var(--deep-olive)] underline decoration-[var(--plum-red)]/30 underline-offset-[6px] hover:opacity-80 break-all"
                 >
-                  hello@example.com
+                  gregg@gb-management.com
                 </a>
               </div>
 
@@ -515,19 +717,17 @@ function About() {
 
               <div className="md:col-span-5 md:col-start-8 text-left md:pl-4">
                 <p className="text-[11px] sm:text-xs tracking-[0.22em] uppercase text-[var(--plum-red)]/90 mb-2">Phone</p>
-                <a href="tel:+10000000000" className="text-lg sm:text-xl font-light tracking-tight hover:opacity-80">
-                  (000) 000-0000
+                <a href="tel:+13104564156" className="text-lg sm:text-xl font-light tracking-tight hover:opacity-80">
+                  (310) 456-4156
                 </a>
               </div>
 
               <div className="md:col-span-10 md:col-start-2 mt-2 md:mt-14 flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4 sm:gap-8 px-6 py-6 rounded-2xl bg-[var(--plum-red)]/[0.06] border border-[var(--plum-red)]/15">
                 <p className="text-[11px] sm:text-xs tracking-[0.22em] uppercase text-[var(--plum-red)] shrink-0">
-                  Representation
+                  Management
                 </p>
                 <p className="text-base sm:text-lg text-[var(--deep-olive)]/90 leading-snug text-center sm:text-left">
-                  <span className="font-medium text-[var(--deep-olive)]">Agency name</span>
-                  <span className="mx-2 text-[var(--deep-olive)]/35 hidden sm:inline">—</span>
-                  <span className="block sm:inline mt-1 sm:mt-0">City, State</span>
+                  <span className="font-medium text-[var(--deep-olive)]">Gregg Baker Management</span>
                 </p>
               </div>
             </div>
@@ -543,13 +743,12 @@ function Footer() {
     <footer className="relative w-full bg-[var(--deep-olive)] text-[var(--cream)]">
       <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 py-10 sm:py-12 lg:py-14 min-h-[520px] sm:min-h-[560px] flex flex-col justify-between">
         <div className="grid grid-cols-3 items-start text-[11px] sm:text-xs tracking-[0.18em] uppercase text-[var(--cream)]/80">
-          <a href="mailto:hello@example.com" className="justify-self-start hover:text-[var(--cream)] transition-colors">
+          <a href="mailto:gregg@gb-management.com" className="justify-self-start hover:text-[var(--cream)] transition-colors">
             Email
           </a>
           <span className="justify-self-center text-center">Gloria Vivica</span>
           <div className="justify-self-end text-right">
             <p>Film & Theater</p>
-            <p className="mt-2 text-[var(--cream)]/60">City, State</p>
           </div>
         </div>
 

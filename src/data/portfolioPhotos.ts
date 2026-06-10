@@ -13,6 +13,48 @@ const studioHeadshotApr2026 =
 
 export const portfolioPhotos: readonly PortfolioPhoto[] = [
   {
+    id: 'stage-garcia-neon',
+    src: '/uploads/BE507BCD-108C-4607-A812-D841C08C427C.png',
+    w: 1024,
+    h: 1536,
+    label: 'Stage — Garcia',
+  },
+  {
+    id: 'tempest-caliban',
+    src: '/uploads/IMG_1493.JPG',
+    w: 2242,
+    h: 4024,
+    label: 'The Tempest — Caliban',
+  },
+  {
+    id: 'pancha-houston-chronicle',
+    src: '/uploads/Screenshot%20from%202026-06-10%2012-40-34.png',
+    w: 1210,
+    h: 1515,
+    label: 'Stage — Pancha',
+  },
+  {
+    id: 'stage-window-ensemble',
+    src: '/uploads/Screenshot%20from%202026-06-10%2012-41-34.png',
+    w: 1547,
+    h: 1014,
+    label: 'Stage — window ensemble',
+  },
+  {
+    id: 'tempest-caliban-performance',
+    src: '/uploads/Screenshot%20from%202026-06-10%2012-42-11.png',
+    w: 1578,
+    h: 1231,
+    label: 'The Tempest — Caliban performance',
+  },
+  {
+    id: 'trinity-ensemble-motion',
+    src: '/uploads/Screenshot%20from%202026-06-10%2012-42-43.png',
+    w: 1431,
+    h: 979,
+    label: 'Trinity Rep — ensemble',
+  },
+  {
     id: 'emw-24',
     src: '/uploads/Resized_GloriaBenavides_EMW_24-00060.jpeg',
     w: 1750,
