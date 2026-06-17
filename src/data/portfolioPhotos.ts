@@ -55,10 +55,10 @@ export const portfolioPhotos: readonly PortfolioPhoto[] = [
     label: 'Trinity Rep — ensemble',
   },
   {
-    id: 'emw-24',
-    src: '/uploads/Resized_GloriaBenavides_EMW_24-00060.jpeg',
-    w: 1750,
-    h: 2334,
+    id: 'mean-expression',
+    src: '/uploads/IMG_3464(2).jpg',
+    w: 4000,
+    h: 5000,
     label: 'Headshot',
   },
   {
@@ -74,6 +74,13 @@ export const portfolioPhotos: readonly PortfolioPhoto[] = [
     w: 4000,
     h: 6000,
     label: 'Facetune portrait',
+  },
+  {
+    id: 'serious-expression',
+    src: '/uploads/serious_expression.png',
+    w: 1241,
+    h: 1552,
+    label: 'Headshot — serious',
   },
   {
     id: 'studio-headshot-2026-04',
@@ -121,6 +128,14 @@ export const heroRunway = {
   w: 960,
   h: Math.round((960 * editorial.h) / editorial.w),
 }
+
+export const headshotPhotos: readonly PortfolioPhoto[] = [
+  portfolioPhotos.find((p) => p.id === 'studio-headshot-2026-04')!,
+  portfolioPhotos.find((p) => p.id === 'mean-expression')!,
+  portfolioPhotos.find((p) => p.id === 'still-04')!,
+  portfolioPhotos.find((p) => p.id === 'serious-expression')!,
+  portfolioPhotos.find((p) => p.id === 'facetune-0825')!,
+]
 
 export const aboutPortrait = {
   src: primary.src,

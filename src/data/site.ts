@@ -7,18 +7,28 @@ export const site = {
   initialsMark: 'G . V',
   logoMark: 'G.V',
   productionLine: 'Film & theatre',
-  locationLine: 'Los Angeles, California',
+  locationLine: 'Chicago, Illinois',
   contactEmail: 'gregg@gb-management.com',
   /** Primary hero portrait (`public/` path). */
-  headshotHero: '/uploads/Resized_GloriaBenavides_EMW_24-00060.jpeg',
+  headshotHero: '/uploads/WhatsApp%20Image%202026-04-20%20at%2011.42.32%20PM.jpeg',
   bio: [
     'Gloria works in film and theatre with a bias toward intimate stories, sharp rhythm in the cut, and characters who refuse to explain themselves too neatly.',
     'Select bookings and collaborations by inquiry. Representation and materials available on request.',
   ],
   social: [
     { label: 'Email', href: 'mailto:gregg@gb-management.com' },
-    { label: 'Insta', href: '#' },
-    { label: 'LinkedIn', href: '#' },
+    {
+      label: 'Instagram',
+      href: 'https://www.instagram.com/gloriavivica?igsh=MWh3ZjE4NXF6bzl5bA%3D%3D&utm_source=qr',
+    },
+    {
+      label: 'Facebook',
+      href: 'https://www.facebook.com/share/1BgDdx11Ek/?mibextid=wwXIfr',
+    },
+    {
+      label: 'IMDb',
+      href: 'https://www.imdb.com/name/nm10921109/?ref_=ext_shr_lnk',
+    },
   ],
   /** Mock contact sheet for /contact — replace with real details later. */
   contact: {

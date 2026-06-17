@@ -3,8 +3,12 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { AnimatePresence, motion, useScroll } from "framer-motion";
 import { subscribeScrollFrame } from "@/lib/scrollFrame";
+import { resume } from "@/data/resume";
+import { headshotPhotos } from "@/data/portfolioPhotos";
 
-const HERO_TITLES = ["Actress", "Performer", "Storyteller"];
+const HERO_TAGLINE = "Actor · Comedian · Storyteller";
+const HERO_BIO =
+  "Queer Mexican-American actor based in Chicago, Illinois with nationwide credits in stage, voice-over, and film.";
 
 /**
  * Sticky section title fades out before content meets it: visibility uses
@@ -35,8 +39,107 @@ function useStickyOverlapFade(
   return { titleRef, titleVisible };
 }
 
-const WORK_SAMPLE_DESCRIPTION =
-  "Brief credits and synopsis go here—logline, director, festival notes, or press lines when you have final copy.";
+const NEWS_FEATURE_IMAGE = {
+  src: "/uploads/Screenshot%20from%202026-06-10%2012-40-34.png",
+  alt: "Gloria Vivica Benavides on stage as Pancha with Houston Chronicle review",
+  caption: "Houston Chronicle review of Real Women Have Curves at the Alley Theatre",
+};
+
+type NewsClipStyle = "headline" | "editorial" | "accent" | "feature";
+
+type NewsClip = {
+  quote: string;
+  source?: string;
+  style: NewsClipStyle;
+  align: "left" | "center" | "right";
+};
+
+const NEWS_CLIPS: NewsClip[] = [
+  {
+    quote:
+      "Standouts include Gloria Vivica Benavides, who brings sophisticated senses of timing and subtle gesture to Caliban.",
+    source: "Broadway World Review for The Tempest at Trinity Repertory Theatre",
+    style: "editorial",
+    align: "left",
+  },
+  {
+    quote: "…a scene-stealing Gloria Vivica Benavides",
+    source: "Chicago Sun Times on American Mariachi at Goodman Theatre",
+    style: "headline",
+    align: "center",
+  },
+  {
+    quote:
+      "…all wonderful, especially Benavides who steals every scene she's in as a sexy-and-I-know-it hairdresser)…",
+    source: "Dallas Morning News on American Mariachi at Dallas Theater Center",
+    style: "accent",
+    align: "right",
+  },
+  {
+    quote:
+      "The latter, Gloria Vivica Benavides, is hilarious in that role and as Antonia, a well-meaning neighbor who ignites Reina's dreams of escaping to America.",
+    source: "Onstage Pittsburgh on Somewhere Over the Border at Pittsburgh City Theatre",
+    style: "editorial",
+    align: "left",
+  },
+  {
+    quote:
+      "every time Gloria Vivica Benavides opens her mouth to sing, this massive rafter-shaking roar comes forth that leaves the audience breathless.",
+    source: "Broadway World",
+    style: "feature",
+    align: "center",
+  },
+  {
+    quote:
+      "Benavides is a breakout star of the show, even playing the comic relief. She portrays two characters who are polar opposites from one another, but you'll want more of both.",
+    source: "Broadway World",
+    style: "feature",
+    align: "left",
+  },
+];
+
+function NewspaperIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden
+    >
+      <path d="M4 5h16v14H4z" />
+      <path d="M7 9h10M7 12h10M7 15h6" />
+      <path d="M4 5l2-2h12l2 2" />
+    </svg>
+  );
+}
+
+function newsClipTypography(style: NewsClipStyle): string {
+  switch (style) {
+    case "headline":
+      return "text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] text-[var(--terracotta)] font-['Instrument_Serif'] italic leading-[1.12] tracking-tight";
+    case "editorial":
+      return "text-lg sm:text-xl lg:text-2xl text-[var(--deep-olive)]/85 font-['Inter'] font-normal leading-[1.65] tracking-normal";
+    case "accent":
+      return "text-2xl sm:text-3xl lg:text-4xl text-[var(--plum-red)]/90 font-['Syne'] font-medium leading-snug tracking-tight";
+    case "feature":
+      return "text-xl sm:text-2xl md:text-[1.75rem] text-[var(--deep-olive)]/80 font-['Cormorant_Garamond'] font-light leading-[1.5] tracking-[0.01em]";
+  }
+}
+
+function newsClipAlign(align: NewsClip["align"]): string {
+  switch (align) {
+    case "left":
+      return "text-left ml-0 mr-auto max-w-3xl";
+    case "right":
+      return "text-right ml-auto mr-0 max-w-3xl";
+    case "center":
+      return "text-center mx-auto max-w-4xl";
+  }
+}
 
 function Navigation() {
   const [activeSection, setActiveSection] = useState("home");
@@ -45,14 +148,15 @@ function Navigation() {
 
   const navItems = [
     { id: "home", label: "Home" },
-    { id: "work", label: "Work" },
+    { id: "work", label: "News" },
     { id: "gallery", label: "Gallery" },
+    { id: "resume", label: "Resume" },
     { id: "about", label: "About" },
   ];
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ["home", "work", "gallery", "about"];
+      const sections = ["home", "work", "gallery", "resume", "about"];
       const scrollPosition = window.scrollY + 200;
 
       for (const section of sections) {
@@ -121,17 +225,9 @@ function Navigation() {
 }
 
 function Hero() {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [textVisible, setTextVisible] = useState(true);
   const imageRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % HERO_TITLES.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -158,8 +254,8 @@ function Hero() {
             transition={{ duration: 1, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
             className="text-center"
           >
-            <h1 className="text-7xl sm:text-8xl lg:text-9xl xl:text-[12rem] tracking-tighter text-[var(--deep-olive)] leading-[0.9] font-['Inter'] mb-6">
-              Gloria Vivica
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[7.5rem] tracking-tighter text-[var(--deep-olive)] leading-[0.95] font-['Inter'] mb-6">
+              Gloria Vivica Benavides
             </h1>
           </motion.div>
 
@@ -167,18 +263,14 @@ function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="h-16 sm:h-20 lg:h-24 flex items-center justify-center"
+            className="flex flex-col items-center justify-center gap-6 sm:gap-8"
           >
-            {/* Rotating tagline (cycles every few seconds; could add AnimatePresence for a crossfade) */}
-            <motion.p
-              key={currentIndex}
-              initial={{ y: 40, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl text-[var(--terracotta)] font-['Instrument_Serif'] italic tracking-tight"
-            >
-              {HERO_TITLES[currentIndex]}
-            </motion.p>
+            <p className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl text-[var(--terracotta)] font-['Instrument_Serif'] italic tracking-tight text-center">
+              {HERO_TAGLINE}
+            </p>
+            <p className="text-base sm:text-lg lg:text-xl text-[var(--deep-olive)] leading-relaxed text-center max-w-2xl px-2">
+              {HERO_BIO}
+            </p>
           </motion.div>
         </div>
 
@@ -193,25 +285,13 @@ function Hero() {
             <div className="relative aspect-[4/5] overflow-hidden rounded-3xl">
               <img
                 src="/uploads/WhatsApp%20Image%202026-04-20%20at%2011.42.32%20PM.jpeg"
-                alt="Gloria Vivica"
+                alt="Gloria Vivica Benavides"
                 className="w-full h-full object-cover object-[center_35%]"
                 fetchPriority="high"
                 decoding="async"
               />
               <div className="absolute inset-0 ring-1 ring-inset ring-[var(--plum-red)]/20 pointer-events-none rounded-3xl" />
             </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
-            className="lg:col-span-12 flex flex-col items-center justify-center space-y-8 mt-12 lg:mt-16"
-          >
-            <p className="text-base sm:text-lg lg:text-xl text-[var(--deep-olive)] leading-relaxed text-center max-w-2xl">
-              City, State–based performer specializing in emotionally complex character work across film, television,
-              and theater.
-            </p>
           </motion.div>
         </div>
       </div>
@@ -220,261 +300,88 @@ function Hero() {
 }
 
 function Work() {
-  const overlapRef = useRef<HTMLDivElement>(null);
-  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 40);
-
-  const projects: {
-    title?: string;
-    role?: string;
-    type?: string;
-    location?: string;
-    quote?: string;
-    quoteSource?: string;
-    standaloneQuote?: boolean;
-    standaloneQuoteVariant?: "display" | "artsy";
-    boxAlign?: "left" | "center" | "right";
-  }[] = [
-    {
-      quote:
-        "Standouts include Gloria Vivica Benavides, who brings sophisticated senses of timing and subtle gesture to Caliban.",
-      quoteSource: "Broadway World Review for The Tempest at Trinity Repertory Theatre",
-      boxAlign: "right",
-    },
-    {
-      quote: "…a scene-stealing Gloria Vivica Benavides",
-      quoteSource: "Chicago Sun Times",
-      standaloneQuote: true,
-    },
-    {
-      quote:
-        "The latter, Gloria Vivica Benavides, is hilarious in that role and as Antonia, a well-meaning neighbor who ignites Reina's dreams of escaping to America.",
-      quoteSource: "Onstage Pittsburgh",
-    },
-    {
-      quote: "a sexy-and-I-know-it hairdresser",
-      standaloneQuote: true,
-    },
-    {
-      quote:
-        "every time Gloria Vivica Benavides opens her mouth to sing, this massive rafter-shaking roar comes forth that leaves the audience breathless.",
-      quoteSource: "Broadway World",
-    },
-    {
-      quote:
-        "Benavides is a break out star of the show, even playing the comic relief. She portrays two characters who are polar opposites from one another, but you'll want more of both.",
-      standaloneQuote: true,
-      standaloneQuoteVariant: "artsy",
-    },
-  ];
-
-  const layouts = [
-    "lg:ml-0 lg:w-[85%]",
-    "lg:ml-auto lg:w-[70%]",
-    "lg:mx-auto lg:w-[60%]",
-    "lg:ml-auto lg:w-[80%]",
-    "lg:ml-0 lg:w-[65%]",
-    "lg:mx-auto lg:w-[75%]",
-  ];
-
-  const titleColors = [
-    "text-[var(--terracotta)]",
-    "text-[var(--deep-olive)]",
-    "text-[var(--olive-green)]",
-    "text-[var(--plum-red)]",
-    "text-[var(--terracotta)]",
-    "text-[var(--deep-olive)]",
-  ];
-
-  const bgColors = [
-    "bg-[#e8e4de]",
-    "bg-[#e9ddd8]",
-    "bg-[#dde3d4]",
-    "bg-[#e5d9cc]",
-    "bg-[#ebe4dc]",
-    "bg-[#dfe5d8]",
-  ];
-
-  const titleSizes = [
-    "text-5xl sm:text-6xl lg:text-7xl",
-    "text-4xl sm:text-5xl lg:text-6xl",
-    "text-6xl sm:text-7xl lg:text-8xl",
-    "text-5xl sm:text-6xl lg:text-7xl",
-    "text-4xl sm:text-5xl lg:text-6xl",
-    "text-5xl sm:text-6xl lg:text-7xl",
-  ];
-
-  const standaloneQuoteColors: Record<number, { text: string; footer: string }> = {
-    1: {
-      text: "text-[var(--terracotta)]",
-      footer: "text-[var(--terracotta)]/50",
-    },
-    3: {
-      text: "text-[var(--plum-red)]",
-      footer: "text-[var(--plum-red)]/45",
-    },
-    5: {
-      text: "text-[var(--terracotta)]/90",
-      footer: "text-[var(--terracotta)]/45",
-    },
-  };
-
   return (
-    <section id="work" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 lg:px-12">
-      <div className="max-w-[1400px] mx-auto">
-        <div
-          ref={titleRef}
-          className="sticky top-32 sm:top-36 lg:top-44 z-[2] mb-16 lg:mb-24 transition-opacity duration-300"
-          style={{
-            opacity: titleVisible ? 1 : 0,
-            pointerEvents: titleVisible ? "auto" : "none",
-          }}
+    <section id="work" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 lg:px-12 overflow-hidden">
+      {/* faint column rules — editorial texture */}
+      <div
+        className="pointer-events-none absolute inset-0 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12"
+        aria-hidden
+      >
+        <div className="relative h-full max-w-3xl mx-auto border-x border-[var(--deep-olive)]/[0.06]" />
+      </div>
+
+      <div className="max-w-[1400px] mx-auto relative">
+        <motion.header
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
+          className="relative z-[2] mb-12 sm:mb-16 lg:mb-20"
         >
-          <motion.h2
-            initial={{ opacity: 1, y: 22 }}
+          <h2 className="text-6xl sm:text-7xl lg:text-8xl xl:text-[9rem] 2xl:text-[10rem] tracking-tighter text-[var(--deep-olive)] leading-[0.9] font-['Instrument_Serif'] text-center">
+            News
+          </h2>
+        </motion.header>
+
+        <div className="relative z-10 max-w-3xl mx-auto space-y-14 sm:space-y-20 lg:space-y-24">
+          <motion.figure
+            initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: "some", margin: "0px 0px -120px 0px" }}
-            transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
-            className="text-6xl sm:text-7xl lg:text-8xl xl:text-[9rem] 2xl:text-[10rem] tracking-tighter text-[var(--deep-olive)] leading-[0.9] font-['Instrument_Serif'] text-center"
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.9 }}
+            className="w-full"
           >
-            Selected Work
-          </motion.h2>
-        </div>
+            <div className="overflow-hidden rounded-2xl border border-[var(--deep-olive)]/10 shadow-md">
+              <img
+                src={NEWS_FEATURE_IMAGE.src}
+                alt={NEWS_FEATURE_IMAGE.alt}
+                className="block w-full h-auto"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <figcaption className="mt-5 sm:mt-6 text-sm sm:text-base text-[var(--deep-olive)]/55 font-['Inter'] italic text-center leading-relaxed">
+              — {NEWS_FEATURE_IMAGE.caption}
+            </figcaption>
+          </motion.figure>
 
-        <div className="space-y-16 lg:space-y-24">
-          {projects.map((project, index) => {
-            const meta = [project.type, project.location].filter(Boolean).join(" · ");
-            const hasCredits = project.title || project.role || meta;
+          <div className="flex items-center gap-4 text-[var(--deep-olive)]/30" aria-hidden>
+            <span className="h-px flex-1 bg-current" />
+            <NewspaperIcon className="w-5 h-5 shrink-0 text-[var(--plum-red)]/45" />
+            <span className="font-['Syne'] text-[10px] sm:text-xs tracking-[0.28em] uppercase text-[var(--deep-olive)]/40">
+              In the press
+            </span>
+            <NewspaperIcon className="w-5 h-5 shrink-0 text-[var(--plum-red)]/45" />
+            <span className="h-px flex-1 bg-current" />
+          </div>
 
-            if (project.standaloneQuote && project.quote) {
-              const isArtsy = project.standaloneQuoteVariant === "artsy";
-              const colors = standaloneQuoteColors[index] ?? {
-                text: "text-[var(--terracotta)]",
-                footer: "text-[var(--terracotta)]/50",
-              };
-
-              return (
-                <motion.div
-                  key={`quote-${index}`}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.9, delay: index * 0.1 }}
-                  className={`relative z-10 w-full ${isArtsy ? "py-16 sm:py-20 lg:py-28" : "py-12 sm:py-16 lg:py-24"}`}
-                >
-                  <blockquote
-                    className={`w-full text-center ${isArtsy ? "max-w-5xl mx-auto px-2" : ""}`}
-                  >
-                    <p
-                      className={
-                        isArtsy
-                          ? `text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] xl:text-5xl ${colors.text} font-['Cormorant_Garamond'] font-light leading-[1.45] tracking-[0.02em]`
-                          : `text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] ${colors.text} font-['Instrument_Serif'] italic leading-[1.08] tracking-tight`
-                      }
-                    >
-                      &ldquo;{project.quote}&rdquo;
-                    </p>
-                    {project.quoteSource ? (
-                      <footer
-                        className={`mt-8 sm:mt-10 text-sm sm:text-base ${colors.footer} tracking-[0.18em] uppercase`}
-                      >
-                        {project.quoteSource}
-                      </footer>
-                    ) : null}
-                  </blockquote>
-                </motion.div>
-              );
-            }
-
-            const isQuoteOnlyBox = !hasCredits && Boolean(project.quote);
-            const isRightAlignedBox = project.boxAlign === "right";
-            const quoteBlock = project.quote ? (
-              <blockquote className="space-y-3">
-                <p
-                  className={
-                    isQuoteOnlyBox
-                      ? "text-base sm:text-lg lg:text-xl text-[var(--deep-olive)]/70 leading-[1.7] font-['Inter'] font-normal tracking-normal"
-                      : "text-base sm:text-lg text-[var(--deep-olive)]/80 leading-relaxed font-['Instrument_Serif'] italic"
-                  }
-                >
-                  &ldquo;{project.quote}&rdquo;
-                </p>
-                {project.quoteSource ? (
-                  <footer
-                    className={
-                      isQuoteOnlyBox
-                        ? "text-xs sm:text-sm text-[var(--deep-olive)]/45 tracking-[0.12em] uppercase font-['Inter']"
-                        : "text-sm text-[var(--deep-olive)]/60 tracking-wide"
-                    }
-                  >
-                    — {project.quoteSource}
-                  </footer>
-                ) : null}
-              </blockquote>
-            ) : (
-              <p className="text-base sm:text-lg text-[var(--deep-olive)]/80 leading-relaxed">
-                {WORK_SAMPLE_DESCRIPTION}
-              </p>
-            );
-
-            return (
-            <motion.div
-              key={project.title ?? `quote-${index}`}
-              ref={index === 0 ? overlapRef : undefined}
-              initial={{ opacity: 0, y: 60 }}
+          {NEWS_CLIPS.map((clip, index) => (
+            <motion.blockquote
+              key={`${clip.quote.slice(0, 24)}-${index}`}
+              initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, delay: index * 0.1 }}
-              className={`relative z-10 w-full ${
-                isRightAlignedBox
-                  ? "lg:ml-auto lg:w-[70%]"
-                  : layouts[index] ?? layouts[0]
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.75, delay: index * 0.04 }}
+              className={`relative w-full ${newsClipAlign(clip.align)} ${
+                index > 0 ? "pt-2 border-t border-[var(--deep-olive)]/[0.08]" : ""
               }`}
             >
-              <div
-                className={`${bgColors[index] ?? bgColors[0]} p-8 sm:p-10 lg:p-12 rounded-3xl transition-all duration-500 hover:shadow-2xl border border-[var(--deep-olive)]/10`}
-              >
-                <div
-                  className={
-                    hasCredits
-                      ? "flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 lg:gap-12"
-                      : isRightAlignedBox
-                        ? "flex flex-col items-end text-right max-w-4xl ml-auto w-full"
-                        : "flex flex-col items-center text-center max-w-4xl mx-auto"
-                  }
+              {clip.align === "left" ? (
+                <span
+                  className="hidden sm:block absolute -left-6 lg:-left-10 top-1 text-[var(--plum-red)]/25 font-['Instrument_Serif'] text-5xl leading-none select-none"
+                  aria-hidden
                 >
-                  {hasCredits ? (
-                    <div className="flex-1 min-w-0">
-                      {project.title ? (
-                        <h3
-                          className={`${titleSizes[index] ?? titleSizes[0]} ${titleColors[index] ?? titleColors[0]} tracking-tighter leading-[0.9] mb-4 lg:mb-6 font-['Instrument_Serif']`}
-                        >
-                          {project.title}
-                        </h3>
-                      ) : null}
-                      {project.role || meta ? (
-                        <div className="space-y-2">
-                          {project.role ? (
-                            <p className="text-xl sm:text-2xl lg:text-3xl text-[var(--deep-olive)] font-['Instrument_Serif'] italic">
-                              {project.role}
-                            </p>
-                          ) : null}
-                          {meta ? (
-                            <p className="text-sm sm:text-base text-[var(--deep-olive)]/60 tracking-wider uppercase">
-                              {meta}
-                            </p>
-                          ) : null}
-                        </div>
-                      ) : null}
-                    </div>
-                  ) : null}
-                  <div className={hasCredits ? "lg:max-w-[40%] lg:text-right" : "w-full"}>
-                    {quoteBlock}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-            );
-          })}
+                  &ldquo;
+                </span>
+              ) : null}
+              <p className={newsClipTypography(clip.style)}>&ldquo;{clip.quote}&rdquo;</p>
+              {clip.source ? (
+                <footer className="mt-4 sm:mt-5 font-['Syne'] text-[10px] sm:text-xs tracking-[0.22em] uppercase text-[var(--deep-olive)]/45">
+                  — {clip.source}
+                </footer>
+              ) : null}
+            </motion.blockquote>
+          ))}
         </div>
       </div>
     </section>
@@ -483,54 +390,75 @@ function Work() {
 
 function Gallery() {
   const overlapRef = useRef<HTMLDivElement>(null);
-  /** Lead must stay below the real title→content gap or the heading stays opacity:0 forever. */
   const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 48);
 
-  const images: {
-    src: string;
-    alt: string;
-    fit?: "cover" | "natural";
-  }[] = [
-    {
+  type GalleryImage = { src: string; alt: string; fit?: "cover" | "natural" };
+
+  const featured: { image: GalleryImage; caption: string } = {
+    image: {
       src: "/uploads/BE507BCD-108C-4607-A812-D841C08C427C.png",
       alt: "Gloria Vivica Benavides on stage in an orange dress beneath a Garcia neon sign",
       fit: "natural",
     },
+    caption: "Gloria as Pancha in Real Women Have Curves at the Alley Theatre",
+  };
+
+  const galleryCaptionClass =
+    "mt-5 sm:mt-6 text-base sm:text-lg lg:text-xl text-[var(--plum-red)] font-['Instrument_Serif'] italic text-center leading-relaxed px-2";
+
+  const productionGroups: { images: [GalleryImage, GalleryImage]; caption: string }[] = [
     {
-      src: "/uploads/IMG_1493.JPG",
-      alt: "Gloria Vivica Benavides as Caliban in The Tempest, full-length stage portrait",
-      fit: "natural",
+      images: [
+        {
+          src: "/uploads/Screenshot%20from%202026-06-10%2012-42-11.png",
+          alt: "Gloria Vivica Benavides as Caliban in The Tempest, mid-performance",
+          fit: "natural",
+        },
+        {
+          src: "/uploads/IMG_1493.JPG",
+          alt: "Gloria Vivica Benavides as Caliban in The Tempest, full-length stage portrait",
+          fit: "natural",
+        },
+      ],
+      caption: "Gloria as Caliban in The Tempest at Trinity Repertory Company",
     },
     {
-      src: "/uploads/Screenshot%20from%202026-06-10%2012-40-34.png",
-      alt: "Gloria Vivica Benavides on stage as Pancha in a sewing workshop set",
-      fit: "natural",
+      images: [
+        {
+          src: "/uploads/Screenshot%20from%202026-06-10%2012-41-34.png",
+          alt: "Ensemble cast peering through a purple window set piece on stage",
+          fit: "natural",
+        },
+        {
+          src: "/uploads/Screenshot%20from%202026-06-10%2012-42-43.png",
+          alt: "Ensemble cast in motion during Somewhere Over the Border",
+          fit: "natural",
+        },
+      ],
+      caption:
+        "Gloria as Antonia in Somewhere Over the Border by Brian Quijada — Syracuse Stage, Geva Theatre, Pittsburgh City Theatre, and People's Light Theatre",
     },
-    {
-      src: "/uploads/Screenshot%20from%202026-06-10%2012-41-34.png",
-      alt: "Ensemble cast peering through a purple window set piece on stage",
-      fit: "natural",
-    },
-    {
-      src: "/uploads/Screenshot%20from%202026-06-10%2012-42-11.png",
-      alt: "Gloria Vivica Benavides as Caliban in The Tempest, mid-performance",
-      fit: "natural",
-    },
-    {
-      src: "/uploads/Screenshot%20from%202026-06-10%2012-42-43.png",
-      alt: "Ensemble cast in motion during a Trinity Repertory Theatre production",
-      fit: "natural",
-    },
-    { src: "/uploads/gloria-benavides-4.jpeg", alt: "Portrait 1" },
-    { src: "/uploads/Resized_GloriaBenavides_EMW_24-00060.jpeg", alt: "Portrait 2" },
-    { src: "/uploads/IMG_3464(2).jpg", alt: "Portrait 3" },
-    { src: "/uploads/Facetune_20-08-2025-01-19-02(1).jpg", alt: "Portrait 4" },
   ];
+
+  const renderImage = (image: GalleryImage, className = "") => (
+    <div
+      className={`relative overflow-hidden rounded-3xl ${
+        image.fit === "natural" ? "" : "aspect-[4/5] lg:aspect-[3/4]"
+      } ${className}`}
+    >
+      <img
+        src={image.src}
+        alt={image.alt}
+        className={image.fit === "natural" ? "block w-full h-auto" : "w-full h-full object-cover"}
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+  );
 
   return (
     <section id="gallery" className="relative w-full bg-transparent py-24 sm:py-32 lg:py-40">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
-        {/* Short padding runway limits sticky travel without a huge empty gap above the grid. */}
         <div className="relative mb-10 sm:mb-14 lg:mb-20 pb-6 sm:pb-8 lg:pb-10">
           <div
             ref={titleRef}
@@ -551,36 +479,203 @@ function Gallery() {
             </motion.h2>
           </div>
         </div>
-        <div className="grid grid-cols-12 gap-4 lg:gap-6">
-          {images.map((image, idx) => (
-            <motion.div
-              key={image.src}
-              ref={idx === 0 ? overlapRef : undefined}
-              initial={{ opacity: 0, y: 60 }}
+
+        <div className="relative z-10 space-y-16 sm:space-y-20 lg:space-y-28">
+          <motion.figure
+            ref={overlapRef}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.9 }}
+            className="max-w-2xl mx-auto w-full"
+          >
+            {renderImage(featured.image)}
+            <figcaption className={galleryCaptionClass}>{featured.caption}</figcaption>
+          </motion.figure>
+
+          {productionGroups.map((group, groupIdx) => (
+            <motion.figure
+              key={group.caption}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, delay: idx * 0.1 }}
-              className={`relative z-10 ${idx % 2 === 0 ? "col-span-12 lg:col-span-7" : "col-span-12 lg:col-span-5 lg:mt-20"}`}
+              transition={{ duration: 0.85, delay: groupIdx * 0.05 }}
+              className="max-w-5xl mx-auto w-full"
             >
-              <div
-                className={`relative overflow-hidden rounded-3xl ${
-                  image.fit === "natural" ? "" : "aspect-[4/5] lg:aspect-[3/4]"
-                }`}
-              >
-                <img
-                  src={image.src}
-                  alt={image.alt}
-                  className={
-                    image.fit === "natural"
-                      ? "block w-full h-auto"
-                      : "w-full h-full object-cover"
-                  }
-                  loading="lazy"
-                  decoding="async"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
+                {group.images.map((image) => (
+                  <div key={image.src}>{renderImage(image)}</div>
+                ))}
               </div>
-            </motion.div>
+              <figcaption className={`${galleryCaptionClass} mt-6 sm:mt-8 max-w-3xl mx-auto`}>
+                {group.caption}
+              </figcaption>
+            </motion.figure>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ResumeCreditList({
+  title,
+  credits,
+}: {
+  title: string;
+  credits: readonly { production: string; role: string; company: string }[];
+}) {
+  return (
+    <div>
+      <h4 className="font-['Syne'] text-[11px] sm:text-xs tracking-[0.24em] uppercase text-[var(--plum-red)] mb-4 sm:mb-5 border-b border-[var(--deep-olive)]/15 pb-2">
+        {title}
+      </h4>
+      <ul className="space-y-2.5 sm:space-y-3">
+        {credits.map((credit) => (
+          <li
+            key={`${credit.production}-${credit.role}-${credit.company}`}
+            className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-0.5 sm:gap-4 text-sm sm:text-base text-[var(--deep-olive)]/90 font-['Inter'] leading-snug"
+          >
+            <span>
+              <span className="font-medium text-[var(--deep-olive)]">{credit.production}</span>
+              <span className="text-[var(--deep-olive)]/55"> · {credit.role}</span>
+            </span>
+            <span className="sm:text-right text-[var(--deep-olive)]/60 text-xs sm:text-sm">{credit.company}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function ResumeHeadshots() {
+  const overlapRef = useRef<HTMLDivElement>(null);
+  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 48);
+
+  return (
+    <section id="resume" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 lg:px-12">
+      <div className="max-w-[1400px] mx-auto">
+        <div className="relative mb-10 sm:mb-12 lg:mb-16 pb-6 sm:pb-8 lg:pb-10">
+          <div
+            ref={titleRef}
+            className="sticky top-32 sm:top-36 lg:top-44 z-[2] transition-opacity duration-100 ease-out"
+            style={{
+              opacity: titleVisible ? 1 : 0,
+              pointerEvents: titleVisible ? "auto" : "none",
+            }}
+          >
+            <motion.h2
+              initial={{ opacity: 1, y: 22 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: "some", margin: "0px 0px -120px 0px" }}
+              transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
+              className="text-6xl sm:text-7xl lg:text-8xl xl:text-[9rem] 2xl:text-[10rem] tracking-tight text-[var(--deep-olive)] leading-[0.95] font-['Instrument_Serif'] text-center px-2"
+            >
+              Resume & Headshots
+            </motion.h2>
+          </div>
+        </div>
+
+        <div ref={overlapRef} className="relative z-10 max-w-4xl mx-auto space-y-16 lg:space-y-20">
+          {resume.documentSrc ? (
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.8 }}
+              className="overflow-hidden rounded-2xl border border-[var(--deep-olive)]/10 shadow-md bg-white"
+            >
+              {resume.documentSrc.endsWith(".pdf") ? (
+                <object
+                  data={resume.documentSrc}
+                  type="application/pdf"
+                  className="w-full min-h-[80vh]"
+                  aria-label="Gloria Vivica Benavides resume"
+                >
+                  <a href={resume.documentSrc} className="block p-8 text-center text-[var(--plum-red)]">
+                    Download resume (PDF)
+                  </a>
+                </object>
+              ) : (
+                <img
+                  src={resume.documentSrc}
+                  alt="Gloria Vivica Benavides resume"
+                  className="block w-full h-auto"
+                />
+              )}
+            </motion.div>
+          ) : null}
+
+          <motion.article
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.8 }}
+            className="rounded-2xl border border-[var(--deep-olive)]/10 bg-[var(--warm-cream)]/40 p-8 sm:p-10 lg:p-12 space-y-10"
+          >
+            <header className="border-b border-[var(--deep-olive)]/15 pb-6 sm:pb-8">
+              <h3 className="text-3xl sm:text-4xl text-[var(--deep-olive)] font-['Instrument_Serif'] tracking-tight">
+                {resume.name}
+              </h3>
+              <p className="mt-2 text-sm sm:text-base text-[var(--deep-olive)]/60 font-['Inter']">{resume.stats}</p>
+              <p className="mt-4 text-sm text-[var(--deep-olive)]/70 font-['Inter']">
+                {resume.management.name} · {resume.management.phone} ·{" "}
+                <a href={`mailto:${resume.management.email}`} className="underline decoration-[var(--plum-red)]/30">
+                  {resume.management.email}
+                </a>
+              </p>
+            </header>
+
+            <ResumeCreditList title="Stage" credits={resume.stage} />
+            <ResumeCreditList title="Voice-over" credits={resume.voiceOver} />
+            <ResumeCreditList title="Film & television" credits={resume.filmTelevision} />
+
+            <div>
+              <h4 className="font-['Syne'] text-[11px] sm:text-xs tracking-[0.24em] uppercase text-[var(--plum-red)] mb-4 sm:mb-5 border-b border-[var(--deep-olive)]/15 pb-2">
+                Education & training
+              </h4>
+              <ul className="space-y-2 text-sm sm:text-base text-[var(--deep-olive)]/85 font-['Inter'] leading-relaxed">
+                {resume.education.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-['Syne'] text-[11px] sm:text-xs tracking-[0.24em] uppercase text-[var(--plum-red)] mb-4 sm:mb-5 border-b border-[var(--deep-olive)]/15 pb-2">
+                Special skills
+              </h4>
+              <p className="text-sm sm:text-base text-[var(--deep-olive)]/85 font-['Inter'] leading-relaxed">
+                {resume.specialSkills}
+              </p>
+            </div>
+          </motion.article>
+
+          <div>
+            <h3 className="text-center text-3xl sm:text-4xl lg:text-5xl text-[var(--deep-olive)] font-['Instrument_Serif'] mb-10 sm:mb-12">
+              Headshots
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
+              {headshotPhotos.map((photo, idx) => (
+                <motion.div
+                  key={photo.id}
+                  initial={{ opacity: 0, y: 32 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.75, delay: idx * 0.06 }}
+                  className="overflow-hidden rounded-2xl border border-[var(--deep-olive)]/10"
+                >
+                  <img
+                    src={photo.src}
+                    alt={`${resume.name} — ${photo.label}`}
+                    className="block w-full h-auto object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -624,7 +719,7 @@ function About() {
               viewport={{ once: true, amount: "some", margin: "0px 0px -200px 0px" }}
               transition={{ duration: 0.75, delay: 0.05 }}
             >
-              Gloria Vivica is a City, State–based actress with a passion for authentic storytelling and emotionally
+              Gloria Vivica is a Chicago, Illinois–based actress with a passion for authentic storytelling and emotionally
               complex character work. With years of experience across film, television, and theater, she brings depth
               and nuance to every role.
             </motion.p>
@@ -694,12 +789,21 @@ function About() {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="relative pt-12 lg:pt-20 max-w-4xl mx-auto"
           >
-            <h3 className="text-center text-3xl sm:text-4xl lg:text-5xl text-[var(--plum-red)] font-['Instrument_Serif'] italic mb-12 sm:mb-14">
+            <h3 className="text-center text-3xl sm:text-4xl lg:text-5xl text-[var(--plum-red)] font-['Instrument_Serif'] italic mb-10 sm:mb-12">
               Let&apos;s collaborate
             </h3>
 
-            <div className="relative grid grid-cols-1 md:grid-cols-12 gap-y-10 md:gap-y-0 md:items-end text-[var(--deep-olive)]">
-              <div className="md:col-span-5 md:col-start-1 text-left md:text-right md:pr-8 md:border-r md:border-[var(--plum-red)]/15">
+            <div className="text-center mb-12 sm:mb-14 pb-10 sm:pb-12 border-b border-[var(--plum-red)]/15">
+              <p className="text-[11px] sm:text-xs tracking-[0.22em] uppercase text-[var(--plum-red)]/90 mb-3">
+                Management
+              </p>
+              <p className="text-2xl sm:text-3xl lg:text-4xl text-[var(--deep-olive)] font-['Instrument_Serif'] tracking-tight">
+                Gregg Baker Management
+              </p>
+            </div>
+
+            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 max-w-2xl mx-auto text-[var(--deep-olive)]">
+              <div className="text-center md:text-right">
                 <p className="text-[11px] sm:text-xs tracking-[0.22em] uppercase text-[var(--plum-red)]/90 mb-2">Email</p>
                 <a
                   href="mailto:gregg@gb-management.com"
@@ -709,26 +813,11 @@ function About() {
                 </a>
               </div>
 
-              <div className="hidden md:flex md:col-span-2 items-center justify-center pb-2">
-                <span className="text-[var(--plum-red)]/40 text-2xl leading-none select-none" aria-hidden>
-                  ·
-                </span>
-              </div>
-
-              <div className="md:col-span-5 md:col-start-8 text-left md:pl-4">
+              <div className="text-center md:text-left">
                 <p className="text-[11px] sm:text-xs tracking-[0.22em] uppercase text-[var(--plum-red)]/90 mb-2">Phone</p>
                 <a href="tel:+13104564156" className="text-lg sm:text-xl font-light tracking-tight hover:opacity-80">
                   (310) 456-4156
                 </a>
-              </div>
-
-              <div className="md:col-span-10 md:col-start-2 mt-2 md:mt-14 flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4 sm:gap-8 px-6 py-6 rounded-2xl bg-[var(--plum-red)]/[0.06] border border-[var(--plum-red)]/15">
-                <p className="text-[11px] sm:text-xs tracking-[0.22em] uppercase text-[var(--plum-red)] shrink-0">
-                  Management
-                </p>
-                <p className="text-base sm:text-lg text-[var(--deep-olive)]/90 leading-snug text-center sm:text-left">
-                  <span className="font-medium text-[var(--deep-olive)]">Gregg Baker Management</span>
-                </p>
               </div>
             </div>
           </motion.div>
@@ -759,12 +848,30 @@ function Footer() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 items-end text-[11px] sm:text-xs tracking-[0.18em] uppercase text-[var(--cream)]/80">
-          <a href="#" className="justify-self-start hover:text-[var(--cream)] transition-colors">
-            IMDb
+        <div className="grid grid-cols-3 items-end text-[11px] sm:text-xs tracking-[0.18em] uppercase text-[var(--cream)]/80">
+          <a
+            href="https://www.instagram.com/gloriavivica?igsh=MWh3ZjE4NXF6bzl5bA%3D%3D&utm_source=qr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="justify-self-start hover:text-[var(--cream)] transition-colors"
+          >
+            Instagram
           </a>
-          <a href="#" className="justify-self-end hover:text-[var(--cream)] transition-colors">
-            LinkedIn
+          <a
+            href="https://www.facebook.com/share/1BgDdx11Ek/?mibextid=wwXIfr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="justify-self-center hover:text-[var(--cream)] transition-colors"
+          >
+            Facebook
+          </a>
+          <a
+            href="https://www.imdb.com/name/nm10921109/?ref_=ext_shr_lnk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="justify-self-end hover:text-[var(--cream)] transition-colors"
+          >
+            IMDb
           </a>
         </div>
       </div>
@@ -787,8 +894,8 @@ function PageLoader() {
           transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
           className="fixed inset-0 z-[10000] bg-[var(--cream)] flex items-center justify-center"
         >
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl tracking-tighter text-[var(--primary)]">
-            Gloria Vivica
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tighter text-[var(--primary)] text-center px-4">
+            Gloria Vivica Benavides
           </h1>
         </motion.div>
       )}
@@ -976,6 +1083,7 @@ export default function FigmaPortfolio() {
         </div>
         <Work />
         <Gallery />
+        <ResumeHeadshots />
         <About />
       </main>
       <Footer />
