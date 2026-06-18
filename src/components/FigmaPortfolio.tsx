@@ -149,14 +149,13 @@ function Navigation() {
   const navItems = [
     { id: "home", label: "Home" },
     { id: "work", label: "News" },
-    { id: "gallery", label: "Gallery" },
-    { id: "resume", label: "Resume" },
+    { id: "portfolio", label: "Portfolio" },
     { id: "about", label: "About" },
   ];
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ["home", "work", "gallery", "resume", "about"];
+      const sections = ["home", "work", "portfolio", "about"];
       const scrollPosition = window.scrollY + 200;
 
       for (const section of sections) {
@@ -195,7 +194,7 @@ function Navigation() {
       className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-sm"
     >
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-6">
-        <div className="relative flex items-center justify-center gap-8 sm:gap-12 lg:gap-16">
+        <div className="relative flex items-center justify-center gap-4 sm:gap-8 lg:gap-16">
           <motion.div
             className="absolute bottom-0 h-0.5 bg-[var(--plum-red)]/80"
             initial={false}
@@ -209,7 +208,7 @@ function Navigation() {
                 navRefs.current[item.id] = el;
               }}
               href={`#${item.id}`}
-              className={`text-sm sm:text-base tracking-wider uppercase transition-all duration-300 relative ${
+              className={`text-xs sm:text-sm md:text-base tracking-wider uppercase transition-all duration-300 relative ${
                 activeSection === item.id
                   ? "text-[var(--plum-red)]"
                   : "text-[var(--deep-olive)]/50 hover:text-[var(--plum-red)]/90"
@@ -388,7 +387,7 @@ function Work() {
   );
 }
 
-function Gallery() {
+function Portfolio() {
   const overlapRef = useRef<HTMLDivElement>(null);
   const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 48);
 
@@ -457,7 +456,7 @@ function Gallery() {
   );
 
   return (
-    <section id="gallery" className="relative w-full bg-transparent py-24 sm:py-32 lg:py-40">
+    <section id="portfolio" className="relative w-full bg-transparent py-24 sm:py-32 lg:py-40">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
         <div className="relative mb-10 sm:mb-14 lg:mb-20 pb-6 sm:pb-8 lg:pb-10">
           <div
@@ -475,43 +474,153 @@ function Gallery() {
               transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
               className="text-6xl sm:text-7xl lg:text-8xl xl:text-[9rem] 2xl:text-[10rem] tracking-tight text-[var(--deep-olive)] leading-[0.95] font-['Instrument_Serif'] text-center px-2 sm:whitespace-nowrap"
             >
-              Gallery
+              Portfolio
             </motion.h2>
           </div>
         </div>
 
-        <div className="relative z-10 space-y-16 sm:space-y-20 lg:space-y-28">
-          <motion.figure
-            ref={overlapRef}
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.9 }}
-            className="max-w-2xl mx-auto w-full"
-          >
-            {renderImage(featured.image)}
-            <figcaption className={galleryCaptionClass}>{featured.caption}</figcaption>
-          </motion.figure>
-
-          {productionGroups.map((group, groupIdx) => (
+        <div className="relative z-10 space-y-20 sm:space-y-24 lg:space-y-32">
+          <div className="space-y-16 sm:space-y-20 lg:space-y-28">
             <motion.figure
-              key={group.caption}
+              ref={overlapRef}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.85, delay: groupIdx * 0.05 }}
-              className="max-w-5xl mx-auto w-full"
+              transition={{ duration: 0.9 }}
+              className="max-w-2xl mx-auto w-full"
             >
+              {renderImage(featured.image)}
+              <figcaption className={galleryCaptionClass}>{featured.caption}</figcaption>
+            </motion.figure>
+
+            {productionGroups.map((group, groupIdx) => (
+              <motion.figure
+                key={group.caption}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.85, delay: groupIdx * 0.05 }}
+                className="max-w-5xl mx-auto w-full"
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
+                  {group.images.map((image) => (
+                    <div key={image.src}>{renderImage(image)}</div>
+                  ))}
+                </div>
+                <figcaption className={`${galleryCaptionClass} mt-6 sm:mt-8 max-w-3xl mx-auto`}>
+                  {group.caption}
+                </figcaption>
+              </motion.figure>
+            ))}
+          </div>
+
+          <div className="max-w-4xl mx-auto space-y-16 lg:space-y-20 pt-8 sm:pt-12 border-t border-[var(--deep-olive)]/15">
+            <div className="text-center">
+              <h3 className="text-3xl sm:text-4xl lg:text-5xl text-[var(--deep-olive)] font-['Instrument_Serif']">
+                Resume
+              </h3>
+            </div>
+
+            {resume.documentSrc ? (
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.8 }}
+                className="overflow-hidden rounded-2xl border border-[var(--deep-olive)]/10 shadow-md bg-white"
+              >
+                {resume.documentSrc.endsWith(".pdf") ? (
+                  <object
+                    data={resume.documentSrc}
+                    type="application/pdf"
+                    className="w-full min-h-[80vh]"
+                    aria-label="Gloria Vivica Benavides resume"
+                  >
+                    <a href={resume.documentSrc} className="block p-8 text-center text-[var(--plum-red)]">
+                      Download resume (PDF)
+                    </a>
+                  </object>
+                ) : (
+                  <img
+                    src={resume.documentSrc}
+                    alt="Gloria Vivica Benavides resume"
+                    className="block w-full h-auto"
+                  />
+                )}
+              </motion.div>
+            ) : null}
+
+            <motion.article
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.8 }}
+              className="rounded-2xl border border-[var(--deep-olive)]/10 bg-[var(--warm-cream)]/40 p-8 sm:p-10 lg:p-12 space-y-10"
+            >
+              <header className="border-b border-[var(--deep-olive)]/15 pb-6 sm:pb-8">
+                <h3 className="text-3xl sm:text-4xl text-[var(--deep-olive)] font-['Instrument_Serif'] tracking-tight">
+                  {resume.name}
+                </h3>
+                <p className="mt-2 text-sm sm:text-base text-[var(--deep-olive)]/60 font-['Inter']">{resume.stats}</p>
+                <p className="mt-4 text-sm text-[var(--deep-olive)]/70 font-['Inter']">
+                  {resume.management.name} · {resume.management.phone} ·{" "}
+                  <a href={`mailto:${resume.management.email}`} className="underline decoration-[var(--plum-red)]/30">
+                    {resume.management.email}
+                  </a>
+                </p>
+              </header>
+
+              <ResumeCreditList title="Stage" credits={resume.stage} />
+              <ResumeCreditList title="Voice-over" credits={resume.voiceOver} />
+              <ResumeCreditList title="Film & television" credits={resume.filmTelevision} />
+
+              <div>
+                <h4 className="font-['Syne'] text-[11px] sm:text-xs tracking-[0.24em] uppercase text-[var(--plum-red)] mb-4 sm:mb-5 border-b border-[var(--deep-olive)]/15 pb-2">
+                  Education & training
+                </h4>
+                <ul className="space-y-2 text-sm sm:text-base text-[var(--deep-olive)]/85 font-['Inter'] leading-relaxed">
+                  {resume.education.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-['Syne'] text-[11px] sm:text-xs tracking-[0.24em] uppercase text-[var(--plum-red)] mb-4 sm:mb-5 border-b border-[var(--deep-olive)]/15 pb-2">
+                  Special skills
+                </h4>
+                <p className="text-sm sm:text-base text-[var(--deep-olive)]/85 font-['Inter'] leading-relaxed">
+                  {resume.specialSkills}
+                </p>
+              </div>
+            </motion.article>
+
+            <div>
+              <h3 className="text-center text-3xl sm:text-4xl lg:text-5xl text-[var(--deep-olive)] font-['Instrument_Serif'] mb-10 sm:mb-12">
+                Headshots
+              </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
-                {group.images.map((image) => (
-                  <div key={image.src}>{renderImage(image)}</div>
+                {headshotPhotos.map((photo, idx) => (
+                  <motion.div
+                    key={photo.id}
+                    initial={{ opacity: 0, y: 32 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-60px" }}
+                    transition={{ duration: 0.75, delay: idx * 0.06 }}
+                    className="overflow-hidden rounded-2xl border border-[var(--deep-olive)]/10"
+                  >
+                    <img
+                      src={photo.src}
+                      alt={`${resume.name} — ${photo.label}`}
+                      className="block w-full h-auto object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </motion.div>
                 ))}
               </div>
-              <figcaption className={`${galleryCaptionClass} mt-6 sm:mt-8 max-w-3xl mx-auto`}>
-                {group.caption}
-              </figcaption>
-            </motion.figure>
-          ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -545,140 +654,6 @@ function ResumeCreditList({
         ))}
       </ul>
     </div>
-  );
-}
-
-function ResumeHeadshots() {
-  const overlapRef = useRef<HTMLDivElement>(null);
-  const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 48);
-
-  return (
-    <section id="resume" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 lg:px-12">
-      <div className="max-w-[1400px] mx-auto">
-        <div className="relative mb-10 sm:mb-12 lg:mb-16 pb-6 sm:pb-8 lg:pb-10">
-          <div
-            ref={titleRef}
-            className="sticky top-32 sm:top-36 lg:top-44 z-[2] transition-opacity duration-100 ease-out"
-            style={{
-              opacity: titleVisible ? 1 : 0,
-              pointerEvents: titleVisible ? "auto" : "none",
-            }}
-          >
-            <motion.h2
-              initial={{ opacity: 1, y: 22 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: "some", margin: "0px 0px -120px 0px" }}
-              transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
-              className="text-6xl sm:text-7xl lg:text-8xl xl:text-[9rem] 2xl:text-[10rem] tracking-tight text-[var(--deep-olive)] leading-[0.95] font-['Instrument_Serif'] text-center px-2"
-            >
-              Resume & Headshots
-            </motion.h2>
-          </div>
-        </div>
-
-        <div ref={overlapRef} className="relative z-10 max-w-4xl mx-auto space-y-16 lg:space-y-20">
-          {resume.documentSrc ? (
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.8 }}
-              className="overflow-hidden rounded-2xl border border-[var(--deep-olive)]/10 shadow-md bg-white"
-            >
-              {resume.documentSrc.endsWith(".pdf") ? (
-                <object
-                  data={resume.documentSrc}
-                  type="application/pdf"
-                  className="w-full min-h-[80vh]"
-                  aria-label="Gloria Vivica Benavides resume"
-                >
-                  <a href={resume.documentSrc} className="block p-8 text-center text-[var(--plum-red)]">
-                    Download resume (PDF)
-                  </a>
-                </object>
-              ) : (
-                <img
-                  src={resume.documentSrc}
-                  alt="Gloria Vivica Benavides resume"
-                  className="block w-full h-auto"
-                />
-              )}
-            </motion.div>
-          ) : null}
-
-          <motion.article
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.8 }}
-            className="rounded-2xl border border-[var(--deep-olive)]/10 bg-[var(--warm-cream)]/40 p-8 sm:p-10 lg:p-12 space-y-10"
-          >
-            <header className="border-b border-[var(--deep-olive)]/15 pb-6 sm:pb-8">
-              <h3 className="text-3xl sm:text-4xl text-[var(--deep-olive)] font-['Instrument_Serif'] tracking-tight">
-                {resume.name}
-              </h3>
-              <p className="mt-2 text-sm sm:text-base text-[var(--deep-olive)]/60 font-['Inter']">{resume.stats}</p>
-              <p className="mt-4 text-sm text-[var(--deep-olive)]/70 font-['Inter']">
-                {resume.management.name} · {resume.management.phone} ·{" "}
-                <a href={`mailto:${resume.management.email}`} className="underline decoration-[var(--plum-red)]/30">
-                  {resume.management.email}
-                </a>
-              </p>
-            </header>
-
-            <ResumeCreditList title="Stage" credits={resume.stage} />
-            <ResumeCreditList title="Voice-over" credits={resume.voiceOver} />
-            <ResumeCreditList title="Film & television" credits={resume.filmTelevision} />
-
-            <div>
-              <h4 className="font-['Syne'] text-[11px] sm:text-xs tracking-[0.24em] uppercase text-[var(--plum-red)] mb-4 sm:mb-5 border-b border-[var(--deep-olive)]/15 pb-2">
-                Education & training
-              </h4>
-              <ul className="space-y-2 text-sm sm:text-base text-[var(--deep-olive)]/85 font-['Inter'] leading-relaxed">
-                {resume.education.map((line) => (
-                  <li key={line}>{line}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-['Syne'] text-[11px] sm:text-xs tracking-[0.24em] uppercase text-[var(--plum-red)] mb-4 sm:mb-5 border-b border-[var(--deep-olive)]/15 pb-2">
-                Special skills
-              </h4>
-              <p className="text-sm sm:text-base text-[var(--deep-olive)]/85 font-['Inter'] leading-relaxed">
-                {resume.specialSkills}
-              </p>
-            </div>
-          </motion.article>
-
-          <div>
-            <h3 className="text-center text-3xl sm:text-4xl lg:text-5xl text-[var(--deep-olive)] font-['Instrument_Serif'] mb-10 sm:mb-12">
-              Headshots
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
-              {headshotPhotos.map((photo, idx) => (
-                <motion.div
-                  key={photo.id}
-                  initial={{ opacity: 0, y: 32 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.75, delay: idx * 0.06 }}
-                  className="overflow-hidden rounded-2xl border border-[var(--deep-olive)]/10"
-                >
-                  <img
-                    src={photo.src}
-                    alt={`${resume.name} — ${photo.label}`}
-                    className="block w-full h-auto object-cover"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -733,54 +708,6 @@ function About() {
               that stretch her range across stage and screen.
             </motion.p>
           </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: "some", margin: "0px 0px -180px 0px" }}
-            transition={{ duration: 0.8, delay: 0.08 }}
-            className="grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-12 pt-12 lg:pt-16 border-t border-[var(--deep-olive)]/28 max-w-5xl mx-auto"
-          >
-            {[
-              {
-                label: "Education",
-                value: "BFA Theatre — University of North Texas",
-              },
-              {
-                label: "Training",
-                value: "Michael Chekhov Acting, Theatre Three · Acting, Dallas Theater Center",
-              },
-              {
-                label: "Mediums",
-                value: "Stage · Film & TV · Voice-over",
-              },
-            ].map((item) => (
-              <div key={item.label} className="text-center">
-                <p className="font-['Syne'] font-bold text-xs sm:text-sm tracking-[0.22em] uppercase text-[var(--plum-red)] mb-3 sm:mb-4 leading-snug">
-                  {item.label}
-                </p>
-                <p className="font-['Instrument_Serif'] text-xl sm:text-2xl lg:text-[1.65rem] text-[var(--deep-olive)] leading-snug tracking-tight">
-                  {item.value}
-                </p>
-              </div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: "some", margin: "0px 0px -180px 0px" }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="max-w-4xl mx-auto text-center"
-          >
-            <p className="font-['Syne'] font-bold text-xs sm:text-sm tracking-[0.22em] uppercase text-[var(--plum-red)] mb-5 sm:mb-6">
-              Special skills
-            </p>
-            <p className="text-base sm:text-lg lg:text-xl text-[var(--deep-olive)]/80 leading-relaxed font-['Inter'] font-normal">
-              Improv · Conversational Spanish (native accent) · Gaming · Fishing · Kickboxing · Boxing · Rifles ·
-              Beginner clarinet · Beginner piano
-            </p>
-          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -1082,8 +1009,7 @@ export default function FigmaPortfolio() {
           <Hero />
         </div>
         <Work />
-        <Gallery />
-        <ResumeHeadshots />
+        <Portfolio />
         <About />
       </main>
       <Footer />
