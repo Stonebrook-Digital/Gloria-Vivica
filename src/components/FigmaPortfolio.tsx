@@ -127,12 +127,12 @@ const UPCOMING_PROJECTS: UpcomingProject[] = [
 const MEDIA_REELS = [
   {
     id: "comedy-reel",
-    label: "Comedy reel",
+    label: "Funny",
     src: "/uploads/Comedy%20Reel.mov",
   },
   {
     id: "dramatic-reel",
-    label: "Dramatic reel",
+    label: "Not Funny",
     src: "/uploads/Dramatic.mov",
   },
 ] as const;
