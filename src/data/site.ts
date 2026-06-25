@@ -4,8 +4,8 @@ export const site = {
   /** Full line shown in hero / footer row (all caps in UI). */
   formalName: 'Gloria Vivica Benavides',
   /** Large footer mark, spaced like “A . D”. */
-  initialsMark: 'G . V',
-  logoMark: 'G.V',
+  initialsMark: 'G . V . B',
+  logoMark: 'G.V.B.',
   productionLine: 'Film & theatre',
   locationLine: 'Chicago, Illinois',
   contactEmail: 'gregg@gb-management.com',

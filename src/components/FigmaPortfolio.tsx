@@ -6,9 +6,9 @@ import { subscribeScrollFrame } from "@/lib/scrollFrame";
 import { resume } from "@/data/resume";
 import { headshotPhotos } from "@/data/portfolioPhotos";
 
-const HERO_TAGLINE = "Actor · Comedian · Storyteller";
+const HERO_TITLES = ["Actor", "Comedian", "Storyteller"];
 const HERO_BIO =
-  "Queer Mexican-American actor based in Chicago, Illinois with nationwide credits in stage, voice-over, and film.";
+  "Queer Mexican-American actor based in Chicago with nationwide credits in stage, voice-over, and film.";
 
 /**
  * Sticky section title fades out before content meets it: visibility uses
@@ -63,14 +63,14 @@ const NEWS_CLIPS: NewsClip[] = [
     align: "left",
   },
   {
-    quote: "…a scene-stealing Gloria Vivica Benavides",
+    quote: "…a scene-stealing Gloria Vivica Benavides…",
     source: "Chicago Sun Times on American Mariachi at Goodman Theatre",
     style: "headline",
     align: "center",
   },
   {
     quote:
-      "…all wonderful, especially Benavides who steals every scene she's in as a sexy-and-I-know-it hairdresser)…",
+      "…all wonderful, especially Benavides who steals every scene she's in as a sexy-and-I-know-it hairdresser…",
     source: "Dallas Morning News on American Mariachi at Dallas Theater Center",
     style: "accent",
     align: "right",
@@ -84,7 +84,7 @@ const NEWS_CLIPS: NewsClip[] = [
   },
   {
     quote:
-      "every time Gloria Vivica Benavides opens her mouth to sing, this massive rafter-shaking roar comes forth that leaves the audience breathless.",
+      "…every time Gloria Benavides opens her mouth to sing, this massive rafter-shaking roar comes forth that leaves the audience breathless.",
     source: "Broadway World",
     style: "feature",
     align: "center",
@@ -150,12 +150,12 @@ function Navigation() {
     { id: "home", label: "Home" },
     { id: "work", label: "News" },
     { id: "portfolio", label: "Portfolio" },
-    { id: "about", label: "About" },
+    { id: "contact", label: "Contact" },
   ];
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ["home", "work", "portfolio", "about"];
+      const sections = ["home", "work", "portfolio", "contact"];
       const scrollPosition = window.scrollY + 200;
 
       for (const section of sections) {
@@ -224,9 +224,17 @@ function Navigation() {
 }
 
 function Hero() {
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [textVisible, setTextVisible] = useState(true);
   const imageRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % HERO_TITLES.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -264,9 +272,24 @@ function Hero() {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="flex flex-col items-center justify-center gap-6 sm:gap-8"
           >
-            <p className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl text-[var(--terracotta)] font-['Instrument_Serif'] italic tracking-tight text-center">
-              {HERO_TAGLINE}
-            </p>
+            <div
+              className="relative h-12 sm:h-14 lg:h-16 xl:h-[4.5rem] w-full overflow-hidden"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <AnimatePresence initial={false}>
+                <motion.p
+                  key={currentIndex}
+                  initial={{ y: "100%", opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: "-100%", opacity: 0 }}
+                  transition={{ duration: 0.55, ease: [0.25, 0.1, 0.25, 1] }}
+                  className="absolute inset-x-0 top-0 text-3xl sm:text-4xl lg:text-5xl xl:text-6xl text-[var(--terracotta)] font-['Instrument_Serif'] italic tracking-tight text-center leading-none"
+                >
+                  {HERO_TITLES[currentIndex]}
+                </motion.p>
+              </AnimatePresence>
+            </div>
             <p className="text-base sm:text-lg lg:text-xl text-[var(--deep-olive)] leading-relaxed text-center max-w-2xl px-2">
               {HERO_BIO}
             </p>
@@ -301,14 +324,6 @@ function Hero() {
 function Work() {
   return (
     <section id="work" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 lg:px-12 overflow-hidden">
-      {/* faint column rules — editorial texture */}
-      <div
-        className="pointer-events-none absolute inset-0 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12"
-        aria-hidden
-      >
-        <div className="relative h-full max-w-3xl mx-auto border-x border-[var(--deep-olive)]/[0.06]" />
-      </div>
-
       <div className="max-w-[1400px] mx-auto relative">
         <motion.header
           initial={{ opacity: 0, y: 24 }}
@@ -346,11 +361,11 @@ function Work() {
 
           <div className="flex items-center gap-4 text-[var(--deep-olive)]/30" aria-hidden>
             <span className="h-px flex-1 bg-current" />
-            <NewspaperIcon className="w-5 h-5 shrink-0 text-[var(--plum-red)]/45" />
-            <span className="font-['Syne'] text-[10px] sm:text-xs tracking-[0.28em] uppercase text-[var(--deep-olive)]/40">
-              In the press
+            <NewspaperIcon className="w-5 h-5 sm:w-6 sm:h-6 shrink-0 text-[var(--plum-red)]/50" />
+            <span className="font-['Syne'] text-xs sm:text-sm font-semibold tracking-[0.22em] uppercase text-[var(--deep-olive)]/70">
+              Press
             </span>
-            <NewspaperIcon className="w-5 h-5 shrink-0 text-[var(--plum-red)]/45" />
+            <NewspaperIcon className="w-5 h-5 sm:w-6 sm:h-6 shrink-0 text-[var(--plum-red)]/50" />
             <span className="h-px flex-1 bg-current" />
           </div>
 
@@ -517,7 +532,7 @@ function Portfolio() {
           <div className="max-w-4xl mx-auto space-y-16 lg:space-y-20 pt-8 sm:pt-12 border-t border-[var(--deep-olive)]/15">
             <div className="text-center">
               <h3 className="text-3xl sm:text-4xl lg:text-5xl text-[var(--deep-olive)] font-['Instrument_Serif']">
-                Resume
+                Résumé
               </h3>
             </div>
 
@@ -534,16 +549,16 @@ function Portfolio() {
                     data={resume.documentSrc}
                     type="application/pdf"
                     className="w-full min-h-[80vh]"
-                    aria-label="Gloria Vivica Benavides resume"
+                    aria-label="Gloria Vivica Benavides résumé"
                   >
                     <a href={resume.documentSrc} className="block p-8 text-center text-[var(--plum-red)]">
-                      Download resume (PDF)
+                      Download résumé (PDF)
                     </a>
                   </object>
                 ) : (
                   <img
                     src={resume.documentSrc}
-                    alt="Gloria Vivica Benavides resume"
+                    alt="Gloria Vivica Benavides résumé"
                     className="block w-full h-auto"
                   />
                 )}
@@ -570,9 +585,9 @@ function Portfolio() {
                 </p>
               </header>
 
-              <ResumeCreditList title="Stage" credits={resume.stage} />
-              <ResumeCreditList title="Voice-over" credits={resume.voiceOver} />
-              <ResumeCreditList title="Film & television" credits={resume.filmTelevision} />
+              <ResumeCreditList title="Stage (selected roles)" credits={resume.stage} />
+              <ResumeCreditList title="Voice-Over" credits={resume.voiceOver} />
+              <ResumeCreditList title="Film & Television" credits={resume.filmTelevision} />
 
               <div>
                 <h4 className="font-['Syne'] text-[11px] sm:text-xs tracking-[0.24em] uppercase text-[var(--plum-red)] mb-4 sm:mb-5 border-b border-[var(--deep-olive)]/15 pb-2">
@@ -643,12 +658,10 @@ function ResumeCreditList({
         {credits.map((credit) => (
           <li
             key={`${credit.production}-${credit.role}-${credit.company}`}
-            className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-0.5 sm:gap-4 text-sm sm:text-base text-[var(--deep-olive)]/90 font-['Inter'] leading-snug"
+            className="grid grid-cols-1 sm:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)_minmax(0,1fr)] gap-x-4 gap-y-0.5 text-sm sm:text-base text-[var(--deep-olive)]/90 font-['Inter'] leading-snug"
           >
-            <span>
-              <span className="font-medium text-[var(--deep-olive)]">{credit.production}</span>
-              <span className="text-[var(--deep-olive)]/55"> · {credit.role}</span>
-            </span>
+            <span className="font-medium text-[var(--deep-olive)]">{credit.production}</span>
+            <span className="text-[var(--deep-olive)]/75">{credit.role}</span>
             <span className="sm:text-right text-[var(--deep-olive)]/60 text-xs sm:text-sm">{credit.company}</span>
           </li>
         ))}
@@ -657,13 +670,13 @@ function ResumeCreditList({
   );
 }
 
-function About() {
+function Contact() {
   const overlapRef = useRef<HTMLDivElement>(null);
-  /** ~40px lead: larger values exceeded the layout gap and hid “About” whenever this section was on screen. */
+  /** ~40px lead: larger values exceeded the layout gap and hid “Contact” whenever this section was on screen. */
   const { titleRef, titleVisible } = useStickyOverlapFade(overlapRef, 40);
 
   return (
-    <section id="about" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 lg:px-12">
+    <section id="contact" className="relative py-24 sm:py-32 lg:py-40 px-4 sm:px-6 lg:px-12">
       <div className="max-w-[1400px] mx-auto">
         <div className="relative mb-10 sm:mb-12 lg:mb-16 pb-6 sm:pb-8 lg:pb-10">
           <div
@@ -681,74 +694,51 @@ function About() {
               transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
               className="text-6xl sm:text-7xl lg:text-8xl xl:text-[9rem] 2xl:text-[10rem] tracking-tight text-[var(--deep-olive)] leading-[0.95] font-['Instrument_Serif'] text-center px-2 sm:whitespace-nowrap"
             >
-              About
+              Contact
             </motion.h2>
           </div>
         </div>
 
-        <div ref={overlapRef} className="relative z-10 space-y-12 lg:space-y-16">
-          <div className="space-y-8 text-xl sm:text-2xl lg:text-3xl text-[var(--deep-olive)] leading-relaxed max-w-4xl mx-auto text-center font-['Inter'] font-normal">
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: "some", margin: "0px 0px -200px 0px" }}
-              transition={{ duration: 0.75, delay: 0.05 }}
-            >
-              Gloria Vivica is a Chicago, Illinois–based actress with a passion for authentic storytelling and emotionally
-              complex character work. With years of experience across film, television, and theater, she brings depth
-              and nuance to every role.
-            </motion.p>
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: "some", margin: "0px 0px -200px 0px" }}
-              transition={{ duration: 0.75, delay: 0.12 }}
-            >
-              Her training emphasizes emotional truth and meticulous preparation. She continues to seek diverse roles
-              that stretch her range across stage and screen.
-            </motion.p>
+        <motion.div
+          ref={overlapRef}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: "some", margin: "0px 0px -200px 0px" }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="relative z-10 pt-4 lg:pt-8 max-w-4xl mx-auto"
+        >
+          <h3 className="text-center text-3xl sm:text-4xl lg:text-5xl text-[var(--plum-red)] font-['Instrument_Serif'] italic mb-10 sm:mb-12">
+            Let&apos;s collaborate
+          </h3>
+
+          <div className="text-center mb-12 sm:mb-14 pb-10 sm:pb-12 border-b border-[var(--plum-red)]/15">
+            <p className="text-[11px] sm:text-xs tracking-[0.22em] uppercase text-[var(--plum-red)]/90 mb-3">
+              Management
+            </p>
+            <p className="text-2xl sm:text-3xl lg:text-4xl text-[var(--deep-olive)] font-['Instrument_Serif'] tracking-tight">
+              Gregg Baker Management
+            </p>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: "some", margin: "0px 0px -200px 0px" }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="relative pt-12 lg:pt-20 max-w-4xl mx-auto"
-          >
-            <h3 className="text-center text-3xl sm:text-4xl lg:text-5xl text-[var(--plum-red)] font-['Instrument_Serif'] italic mb-10 sm:mb-12">
-              Let&apos;s collaborate
-            </h3>
-
-            <div className="text-center mb-12 sm:mb-14 pb-10 sm:pb-12 border-b border-[var(--plum-red)]/15">
-              <p className="text-[11px] sm:text-xs tracking-[0.22em] uppercase text-[var(--plum-red)]/90 mb-3">
-                Management
-              </p>
-              <p className="text-2xl sm:text-3xl lg:text-4xl text-[var(--deep-olive)] font-['Instrument_Serif'] tracking-tight">
-                Gregg Baker Management
-              </p>
+          <div className="relative grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 max-w-2xl mx-auto text-[var(--deep-olive)]">
+            <div className="text-center md:text-right">
+              <p className="text-[11px] sm:text-xs tracking-[0.22em] uppercase text-[var(--plum-red)]/90 mb-2">Email</p>
+              <a
+                href="mailto:gregg@gb-management.com"
+                className="text-lg sm:text-xl font-light tracking-tight text-[var(--deep-olive)] underline decoration-[var(--plum-red)]/30 underline-offset-[6px] hover:opacity-80 break-all"
+              >
+                gregg@gb-management.com
+              </a>
             </div>
 
-            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 max-w-2xl mx-auto text-[var(--deep-olive)]">
-              <div className="text-center md:text-right">
-                <p className="text-[11px] sm:text-xs tracking-[0.22em] uppercase text-[var(--plum-red)]/90 mb-2">Email</p>
-                <a
-                  href="mailto:gregg@gb-management.com"
-                  className="text-lg sm:text-xl font-light tracking-tight text-[var(--deep-olive)] underline decoration-[var(--plum-red)]/30 underline-offset-[6px] hover:opacity-80 break-all"
-                >
-                  gregg@gb-management.com
-                </a>
-              </div>
-
-              <div className="text-center md:text-left">
-                <p className="text-[11px] sm:text-xs tracking-[0.22em] uppercase text-[var(--plum-red)]/90 mb-2">Phone</p>
-                <a href="tel:+13104564156" className="text-lg sm:text-xl font-light tracking-tight hover:opacity-80">
-                  (310) 456-4156
-                </a>
-              </div>
+            <div className="text-center md:text-left">
+              <p className="text-[11px] sm:text-xs tracking-[0.22em] uppercase text-[var(--plum-red)]/90 mb-2">Phone</p>
+              <a href="tel:+13104564156" className="text-lg sm:text-xl font-light tracking-tight hover:opacity-80">
+                (310) 456-4156
+              </a>
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -768,10 +758,10 @@ function Footer() {
           </div>
         </div>
 
-        <div className="text-center">
+        <div className="text-center overflow-x-hidden">
           <p className="text-[11px] sm:text-xs tracking-[0.32em] uppercase text-[var(--cream)]/70 mb-8">Portfolio</p>
-          <p className="text-[100px] sm:text-[140px] lg:text-[170px] font-['Inter'] font-light tracking-[0.18em] leading-none">
-            G . V
+          <p className="whitespace-nowrap font-['Inter'] font-light tracking-[0.1em] sm:tracking-[0.18em] leading-none text-[clamp(2.75rem,14vw,6.25rem)] sm:text-[140px] lg:text-[170px]">
+            G . V . B
           </p>
         </div>
 
@@ -1010,7 +1000,7 @@ export default function FigmaPortfolio() {
         </div>
         <Work />
         <Portfolio />
-        <About />
+        <Contact />
       </main>
       <Footer />
     </div>

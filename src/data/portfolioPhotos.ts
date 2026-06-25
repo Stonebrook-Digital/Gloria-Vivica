@@ -131,10 +131,10 @@ export const heroRunway = {
 
 export const headshotPhotos: readonly PortfolioPhoto[] = [
   portfolioPhotos.find((p) => p.id === 'studio-headshot-2026-04')!,
-  portfolioPhotos.find((p) => p.id === 'mean-expression')!,
+  portfolioPhotos.find((p) => p.id === 'facetune-0825')!,
   portfolioPhotos.find((p) => p.id === 'still-04')!,
   portfolioPhotos.find((p) => p.id === 'serious-expression')!,
-  portfolioPhotos.find((p) => p.id === 'facetune-0825')!,
+  portfolioPhotos.find((p) => p.id === 'mean-expression')!,
 ]
 
 export const aboutPortrait = {
