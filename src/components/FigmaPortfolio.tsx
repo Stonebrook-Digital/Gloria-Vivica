@@ -98,6 +98,45 @@ const NEWS_CLIPS: NewsClip[] = [
   },
 ];
 
+type UpcomingProject = {
+  role: string;
+  title: string;
+  playwright: string;
+  description: string;
+  href: string;
+};
+
+const UPCOMING_PROJECTS: UpcomingProject[] = [
+  {
+    role: "Lil Nana",
+    title: "miss EMERICA",
+    playwright: "Yona Moises Olivarez",
+    description:
+      "A new work in development at Baltimore Center Stage for their inaugural Trans History Project.",
+    href: "https://www.centerstage.org/education/trans-history-project/",
+  },
+  {
+    role: "Ida Navarro",
+    title: "Untitled Navarro Sister's Play",
+    playwright: "Sandra Delagado",
+    description: "A new musical in development at Cleveland Playhouse.",
+    href: "https://www.clevelandplayhouse.com/shows/2025/the-untitled-navarro-sisters-play",
+  },
+];
+
+const MEDIA_REELS = [
+  {
+    id: "comedy-reel",
+    label: "Comedy reel",
+    src: "/uploads/Comedy%20Reel.mov",
+  },
+  {
+    id: "dramatic-reel",
+    label: "Dramatic reel",
+    src: "/uploads/Dramatic.mov",
+  },
+] as const;
+
 function NewspaperIcon({ className = "" }: { className?: string }) {
   return (
     <svg
@@ -155,7 +194,7 @@ function Navigation() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ["home", "work", "portfolio", "contact"];
+      const sections = ["home", "work", "media", "portfolio", "contact"];
       const scrollPosition = window.scrollY + 200;
 
       for (const section of sections) {
@@ -395,6 +434,98 @@ function Work() {
                 </footer>
               ) : null}
             </motion.blockquote>
+          ))}
+
+          <div className="pt-8 sm:pt-12 border-t border-[var(--deep-olive)]/[0.08] space-y-10 sm:space-y-12">
+            <div className="flex items-center gap-4 text-[var(--deep-olive)]/30" aria-hidden>
+              <span className="h-px flex-1 bg-current" />
+              <span className="font-['Syne'] text-xs sm:text-sm font-semibold tracking-[0.22em] uppercase text-[var(--deep-olive)]/70">
+                Next up
+              </span>
+              <span className="h-px flex-1 bg-current" />
+            </div>
+
+            <div className="space-y-8 sm:space-y-10">
+              {UPCOMING_PROJECTS.map((project, index) => (
+                <motion.article
+                  key={project.title}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.75, delay: index * 0.06 }}
+                  className={`space-y-3 ${index > 0 ? "pt-8 sm:pt-10 border-t border-[var(--deep-olive)]/[0.08]" : ""}`}
+                >
+                  <p className="font-['Syne'] text-[10px] sm:text-xs tracking-[0.22em] uppercase text-[var(--plum-red)]/80">
+                    Playing {project.role}
+                  </p>
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl text-[var(--deep-olive)] font-['Instrument_Serif'] leading-snug">
+                    {project.title}
+                  </h3>
+                  <p className="text-sm sm:text-base text-[var(--deep-olive)]/55 font-['Inter']">
+                    {project.playwright}
+                  </p>
+                  <p className="text-base sm:text-lg text-[var(--deep-olive)]/80 font-['Inter'] leading-relaxed">
+                    {project.description}
+                  </p>
+                  <a
+                    href={project.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block font-['Syne'] text-[10px] sm:text-xs tracking-[0.2em] uppercase text-[var(--plum-red)] underline decoration-[var(--plum-red)]/30 underline-offset-4 hover:opacity-80 transition-opacity"
+                  >
+                    Learn more
+                  </a>
+                </motion.article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Media() {
+  return (
+    <section id="media" className="relative py-20 sm:py-28 lg:py-32 px-4 sm:px-6 lg:px-12">
+      <div className="max-w-[1400px] mx-auto">
+        <motion.header
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
+          className="mb-12 sm:mb-16 lg:mb-20"
+        >
+          <h2 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl tracking-tight text-[var(--deep-olive)] leading-[0.95] font-['Instrument_Serif'] text-center">
+            Media
+          </h2>
+        </motion.header>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
+          {MEDIA_REELS.map((reel, index) => (
+            <motion.figure
+              key={reel.id}
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.8, delay: index * 0.08 }}
+              className="space-y-3"
+            >
+              <div className="overflow-hidden rounded-2xl border border-[var(--deep-olive)]/10 shadow-md bg-[var(--deep-olive)]/5">
+                <video
+                  src={reel.src}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="block w-full aspect-video object-cover bg-black/10"
+                >
+                  <a href={reel.src}>Download {reel.label}</a>
+                </video>
+              </div>
+              <figcaption className="text-center text-sm sm:text-base text-[var(--deep-olive)]/60 font-['Instrument_Serif'] italic">
+                {reel.label}
+              </figcaption>
+            </motion.figure>
           ))}
         </div>
       </div>
@@ -759,7 +890,6 @@ function Footer() {
         </div>
 
         <div className="text-center overflow-x-hidden">
-          <p className="text-[11px] sm:text-xs tracking-[0.32em] uppercase text-[var(--cream)]/70 mb-8">Portfolio</p>
           <p className="whitespace-nowrap font-['Inter'] font-light tracking-[0.1em] sm:tracking-[0.18em] leading-none text-[clamp(2.75rem,14vw,6.25rem)] sm:text-[140px] lg:text-[170px]">
             G . V . B
           </p>
@@ -999,6 +1129,7 @@ export default function FigmaPortfolio() {
           <Hero />
         </div>
         <Work />
+        <Media />
         <Portfolio />
         <Contact />
       </main>
