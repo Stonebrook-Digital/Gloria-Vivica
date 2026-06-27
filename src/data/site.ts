@@ -11,6 +11,22 @@ export const site = {
   contactEmail: 'gregg@gb-management.com',
   /** Primary hero portrait (`public/` path). */
   headshotHero: '/uploads/WhatsApp%20Image%202026-04-20%20at%2011.42.32%20PM.jpeg',
+  /** Search / social previews — keep in sync with hero copy on the homepage. */
+  seo: {
+    siteUrl: 'https://gloriavivica.com',
+    description:
+      'Gloria Vivica Benavides — queer Mexican-American actor based in Chicago with nationwide credits in stage, voice-over, and film.',
+    keywords: [
+      'Gloria Vivica Benavides',
+      'Chicago actor',
+      'stage actor',
+      'voice-over',
+      'film',
+      'theatre',
+      'comedian',
+      'storyteller',
+    ],
+  },
   bio: [
     'Gloria works in film and theatre with a bias toward intimate stories, sharp rhythm in the cut, and characters who refuse to explain themselves too neatly.',
     'Select bookings and collaborations by inquiry. Representation and materials available on request.',
