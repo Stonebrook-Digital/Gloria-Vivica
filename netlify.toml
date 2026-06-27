@@ -1,0 +1,5 @@
+[build]
+  command = "git lfs pull && npm run build"
+
+[build.environment]
+  GIT_LFS_ENABLED = "true"
