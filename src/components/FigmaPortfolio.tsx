@@ -658,6 +658,23 @@ function Portfolio() {
                 </figcaption>
               </motion.figure>
             ))}
+
+            <motion.figure
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.85 }}
+              className="max-w-2xl mx-auto w-full"
+            >
+              {renderImage({
+                src: "/uploads/soylaReyna.jpeg",
+                alt: "Gloria Vivica Benavides as Soyla Reyna in American Mariachi at Goodman Theatre",
+                fit: "natural",
+              })}
+              <figcaption className={galleryCaptionClass}>
+                Gloria as Soyla Reyna in American Mariachi at Goodman Theatre
+              </figcaption>
+            </motion.figure>
           </div>
 
           <div className="max-w-4xl mx-auto space-y-16 lg:space-y-20 pt-8 sm:pt-12 border-t border-[var(--deep-olive)]/15">
