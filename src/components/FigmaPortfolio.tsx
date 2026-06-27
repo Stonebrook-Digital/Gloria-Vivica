@@ -128,12 +128,12 @@ const MEDIA_REELS = [
   {
     id: "comedy-reel",
     label: "Funny",
-    src: "/uploads/Comedy%20Reel.mov",
+    src: "/uploads/comedy-reel.mp4",
   },
   {
     id: "dramatic-reel",
     label: "Not Funny",
-    src: "/uploads/Dramatic.mov",
+    src: "/uploads/dramatic-reel.mp4",
   },
 ] as const;
 
